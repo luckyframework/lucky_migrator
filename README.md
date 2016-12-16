@@ -1,36 +1,40 @@
 # migrate.cr
 
-TODO: Write a description here
+A crystal library that can be used to create/drop/migrate/rollback your database
 
 ## Installation
-
 
 Add this to your application's `shard.yml`:
 
 ```yaml
 dependencies:
   migrate.cr:
-    github: [your-github-name]/migrate.cr
+    github: paulcsmith/migrate.cr
 ```
 
+## Creating, dropping and migrating the database
 
-## Usage
+This library consists of various tasks that can be run from the command line.
 
-
-```crystal
-require "migrate.cr"
+```bash
+crystal lib/migrate.cr/tasks/db/create.cr name_of_db
+crystal lib/migrate.cr/tasks/db/drop.cr name_of_db
+crystal lib/migrate.cr/tasks/db/migrate.cr name_of_db
+crystal lib/migrate.cr/tasks/db/rollback.cr name_of_db
+crystal lib/migrate.cr/tasks/db/rollback_all.cr name_of_db
 ```
 
+## Generating a migration
 
-TODO: Write usage instructions here
+```bash
+crystal lib/migrate.cr/tasks/gen/migration.cr CreateUsers
+```
 
-## Development
-
-TODO: Write development instructions here
+This will create a timestamped migration in `db/migrations`
 
 ## Contributing
 
-1. Fork it ( https://github.com/[your-github-name]/migrate.cr/fork )
+1. Fork it ( https://github.com/paulcsmith/migrate.cr/fork )
 2. Create your feature branch (git checkout -b my-new-feature)
 3. Commit your changes (git commit -am 'Add some feature')
 4. Push to the branch (git push origin my-new-feature)
@@ -38,4 +42,4 @@ TODO: Write development instructions here
 
 ## Contributors
 
-- [[your-github-name]](https://github.com/[your-github-name]) Paul Smith - creator, maintainer
+- [paulcsmith](https://github.com/paulcsmith) Paul Smith - creator, maintainer

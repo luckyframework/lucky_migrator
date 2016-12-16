@@ -1,0 +1,11 @@
+#! /bin/sh
+
+set -e
+
+crystal tasks/db/drop.cr migrate_cr_dev
+crystal tasks/db/create.cr migrate_cr_dev
+crystal tasks/db/migrate.cr migrate_cr_dev
+crystal tasks/db/rollback.cr migrate_cr_dev
+crystal tasks/db/migrate.cr migrate_cr_dev
+crystal tasks/db/rollback_all.cr migrate_cr_dev
+crystal tasks/db/drop.cr migrate_cr_dev

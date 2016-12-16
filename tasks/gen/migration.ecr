@@ -1,0 +1,13 @@
+class <%= name %>::V<%= version %> < Migrate::Migration::V1
+  def migrate
+    execute <<-SQL
+      # SQL GOES HERE
+    SQL
+  end
+
+  def rollback
+    execute <<-SQL
+      # SQL GOES HERE
+    SQL
+  end
+end

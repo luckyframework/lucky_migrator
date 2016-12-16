@@ -4,6 +4,11 @@ version: 0.1.0
 authors:
   - Paul Smith <paulcsmith0218@gmail.com>
 
+dependencies:
+  db:
+    github: crystal-lang/crystal-db
+  pg:
+    github: will/crystal-pg
 
 crystal: 0.19.4
 
