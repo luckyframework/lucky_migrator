@@ -1,0 +1,10 @@
+name: migrate.cr
+version: 0.1.0
+
+authors:
+  - Paul Smith <paulcsmith0218@gmail.com>
+
+
+crystal: 0.19.4
+
+license: MIT
