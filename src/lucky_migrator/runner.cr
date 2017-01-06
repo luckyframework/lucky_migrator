@@ -15,12 +15,13 @@ class LuckyMigrator::Runner
       db_name
     else
       raise <<-ERROR
-      Must set the db name for Migration::Runner
+      Must set the db name for LuckyMigrator::Runner
+
+      This is typically done in your tasks.cr file
 
       Example:
 
           LuckyMigrator::Runner.db_name = "my_db_name"
-
 
       ERROR
     end
@@ -28,6 +29,22 @@ class LuckyMigrator::Runner
 
   def self.migrations
     @@migrations
+  end
+
+  def self.drop_db
+    db_command = "DROP DATABASE #{self.db_name}"
+
+    DB.open("postgres://localhost") do |db|
+      db.exec db_command
+    end
+  end
+
+  def self.create_db
+    db_command = "CREATE DATABASE #{self.db_name}"
+
+    DB.open("postgres://localhost") do |db|
+      db.exec db_command
+    end
   end
 
   def run_pending_migrations

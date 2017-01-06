@@ -6,8 +6,6 @@ class Db::Rollback < LuckyCli::Task
   def call
     puts "Rolling back...".colorize(:cyan)
 
-    LuckyMigrator::Runner.db_name = ARGV.first? || raise "Requires db name passed as first arg"
-
     begin
       LuckyMigrator::Runner.new.rollback_one
       puts "✅  Done".colorize(:green)
