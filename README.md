@@ -19,6 +19,7 @@ LuckyMigrator **requires installing the LuckyCli** so you can run the tasks. See
 
 ```crystal
 # tasks.cr file
+require "lucky_cli"
 
 # This will load all the db tasks
 require "lucky_migrator"
