@@ -1,5 +1,0 @@
-require "db"
-require "pg"
-require "colorize"
-require "../../src/migrate"
-require "../../../../db/migrations/*"

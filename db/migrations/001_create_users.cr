@@ -1,4 +1,4 @@
-class CreateUsers::V001 < Migrate::Migration::V1
+class CreateUsers::V001 < LuckyMigrator::Migration::V1
   def migrate
     execute <<-SQL
     CREATE TABLE users (

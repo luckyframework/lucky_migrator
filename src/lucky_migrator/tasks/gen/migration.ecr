@@ -1,4 +1,4 @@
-class <%= name %>::V<%= version %> < Migrate::Migration::V1
+class <%= name %>::V<%= version %> < LuckyMigrator::Migration::V1
   def migrate
     execute <<-SQL
       # SQL GOES HERE

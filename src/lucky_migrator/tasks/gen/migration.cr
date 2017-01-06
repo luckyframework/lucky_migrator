@@ -1,7 +1,7 @@
 require "colorize"
 require "ecr"
 
-class Migrate::MigrationGenerator
+class LuckyMigrator::MigrationGenerator
   getter :name
   @_version : String?
 
@@ -27,8 +27,15 @@ class Migrate::MigrationGenerator
   end
 end
 
-if ARGV.first? == nil
-  puts "Migration name is required. Example: migrate.cr CreateUsers".colorize(:red)
-else
-  Migrate::MigrationGenerator.new(name: ARGV.first).generate
+class Gen::Migration < LuckyCli::Task
+  banner "Generate a new migration"
+
+  def call
+    if ARGV.first? == nil
+      puts "Migration name is required. Example: migrate.cr CreateUsers".colorize(:red)
+    else
+      LuckyMigrator::MigrationGenerator.new(name: ARGV.first).generate
+      puts "Created migration"
+    end
+  end
 end

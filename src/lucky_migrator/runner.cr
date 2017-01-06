@@ -2,8 +2,8 @@ require "db"
 require "pg"
 require "colorize"
 
-class Migrate::Runner
-  @@migrations = [] of Migrate::Migration::V1.class
+class LuckyMigrator::Runner
+  @@migrations = [] of LuckyMigrator::Migration::V1.class
   @@db_name : String?
 
   def self.db_name=(name)
@@ -19,7 +19,7 @@ class Migrate::Runner
 
       Example:
 
-          Migrate::Runner.db_name = "my_db_name"
+          LuckyMigrator::Runner.db_name = "my_db_name"
 
 
       ERROR

@@ -1,0 +1,5 @@
+require "db"
+require "pg"
+require "lucky_cli"
+require "./lucky_migrator/*"
+require "./lucky_migrator/tasks/**"

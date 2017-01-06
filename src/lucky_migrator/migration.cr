@@ -1,9 +1,9 @@
 require "colorize"
 require "./*"
 
-abstract class Migrate::Migration::V1
+abstract class LuckyMigrator::Migration::V1
   macro inherited
-    Migrate::Runner.migrations << self
+    LuckyMigrator::Runner.migrations << self
 
     def version
       get_version_from_filename
