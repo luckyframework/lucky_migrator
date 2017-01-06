@@ -13,17 +13,23 @@ dependencies:
     github: luckyframework/migrator
 ```
 
-LuckyMigrator **requires installing the LuckyCli** so you can run the tasks.
+LuckyMigrator **requires installing the LuckyCli** so you can run the tasks. See instructions at [the LuckyCli repo](https://github.com/luckyframework/cli).
 
-See instructions at [the LuckyCli repo](https://github.com/luckyframework/cli)
+#### Setup tasks in tasks.cr
 
 ```crystal
-# In your tasks.cr file
+# tasks.cr file
+
 # This will load all the db tasks
 require "lucky_migrator"
 
-# Then require your migrations. Typically this is in db/migrations
+# Require your migrations. Remember to create the directory too.
 require "./db/migrations/*"
+
+LuckyMigrator::Runner.db_name = "my_cool_db"
+
+# This should always be at the bottom or your tasks won't be available in LuckyCli
+LuckyCli::Runner.run
 ```
 
 ## Creating, dropping and migrating the database
