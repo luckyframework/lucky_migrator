@@ -9,7 +9,7 @@ Add this to your application's `shard.yml`:
 ```yaml
 # Remember to also install the LuckyCli to run the tasks
 dependencies:
-  migrate.cr:
+  lucky_migrator:
     github: luckyframework/migrator
 ```
 
