@@ -6,7 +6,7 @@ class Db::Drop < LuckyCli::Task
   def call
     begin
       LuckyMigrator::Runner.drop_db
-      puts "✅  Done".colorize(:green)
+      puts "✅  Done dropping #{LuckyMigrator::Runner.db_name}".colorize(:green)
     rescue e : PQ::PQError
       puts e.message.colorize(:red)
     end
