@@ -1,5 +1,6 @@
 require "colorize"
 require "ecr"
+require "file_utils"
 
 class LuckyMigrator::MigrationGenerator
   getter :name
@@ -11,7 +12,12 @@ class LuckyMigrator::MigrationGenerator
   end
 
   def generate
+    make_migrations_folder_if_missing
     File.write(filename, contents)
+  end
+
+  private def make_migrations_folder_if_missing
+    FileUtils.mkdir_p Dir.current + "/db/migrations_tet"
   end
 
   private def filename
