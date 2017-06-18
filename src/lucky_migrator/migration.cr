@@ -2,6 +2,8 @@ require "colorize"
 require "./*"
 
 abstract class LuckyMigrator::Migration::V1
+  include LuckyMigrator::StatementHelpers
+
   macro inherited
     LuckyMigrator::Runner.migrations << self
 

@@ -1,11 +1,8 @@
 class CreateUsers::V001 < LuckyMigrator::Migration::V1
   def migrate
-    execute <<-SQL
-    CREATE TABLE users (
-      id serial PRIMARY KEY,
-      first_name text NOT NULL
-    )
-    SQL
+    create :users do
+      add :first_name, String
+    end
   end
 
   def rollback

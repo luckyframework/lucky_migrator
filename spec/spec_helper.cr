@@ -1,2 +1,2 @@
 require "spec"
-require "../src/migrate.cr"
+require "../src/lucky_migrator.cr"
