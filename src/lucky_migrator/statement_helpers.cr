@@ -6,4 +6,8 @@ module LuckyMigrator::StatementHelpers
 
     execute statement
   end
+
+  def drop(table_name)
+    execute LuckyMigrator::DropTableStatement.new(table_name).build
+  end
 end

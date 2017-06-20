@@ -6,6 +6,6 @@ class CreateUsers::V001 < LuckyMigrator::Migration::V1
   end
 
   def rollback
-    execute "DROP TABLE users"
+    drop :users
   end
 end
