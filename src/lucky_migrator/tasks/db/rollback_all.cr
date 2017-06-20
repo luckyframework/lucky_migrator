@@ -4,11 +4,9 @@ class Db::RollbackAll < LuckyCli::Task
   banner "Rollback all migrations"
 
   def call
-    puts "Rolling back all migrations...".colorize(:cyan)
-
     begin
       LuckyMigrator::Runner.new.rollback_all
-      puts "✅  Done".colorize(:green)
+      puts "Done rolling back all migrations".colorize(:green)
     rescue e : PQ::PQError
       puts e.message.colorize(:red)
     end

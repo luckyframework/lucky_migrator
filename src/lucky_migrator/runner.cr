@@ -49,7 +49,11 @@ class LuckyMigrator::Runner
 
   def run_pending_migrations
     setup_migration_tracking_tables
-    pending_migrations.each &.new.up
+    if pending_migrations.empty?
+      puts "Did nothing. No pending migrations.".colorize(:green)
+    else
+      pending_migrations.each &.new.up
+    end
   end
 
   def rollback_all
@@ -60,7 +64,7 @@ class LuckyMigrator::Runner
   def rollback_one
     setup_migration_tracking_tables
     if migrated_migrations.empty?
-      puts "All migrations have been rolled back"
+      puts "Did nothing. No migration to roll back.".colorize(:green)
     else
       migrated_migrations.last.new.down
     end
