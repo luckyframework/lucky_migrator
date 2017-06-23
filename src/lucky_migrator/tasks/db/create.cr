@@ -6,7 +6,7 @@ class Db::Create < LuckyCli::Task
   def call
     begin
       LuckyMigrator::Runner.create_db
-      puts "Done creating #{LuckyMigrator::Runner.db_name}".colorize(:green)
+      puts "Done creating #{LuckyMigrator::Runner.db_name.colorize(:green)}"
     rescue e : PQ::PQError
       puts e.message.colorize(:red)
     end
