@@ -17,7 +17,7 @@ class LuckyMigrator::MigrationGenerator
   end
 
   private def make_migrations_folder_if_missing
-    FileUtils.mkdir_p Dir.current + "/db/migrations_tet"
+    FileUtils.mkdir_p Dir.current + "/db/migrations"
   end
 
   private def filename
@@ -38,7 +38,7 @@ class Gen::Migration < LuckyCli::Task
 
   def call
     if ARGV.first? == nil
-      puts "Migration name is required. Example: migrate.cr CreateUsers".colorize(:red)
+      puts "Migration name is required. Example: lucky gen.migration CreateUsers".colorize(:red)
     else
       LuckyMigrator::MigrationGenerator.new(name: ARGV.first).generate
       puts "Created migration"
