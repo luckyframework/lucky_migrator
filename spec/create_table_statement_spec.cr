@@ -5,6 +5,7 @@ describe LuckyMigrator::CreateTableStatement do
     statement = LuckyMigrator::CreateTableStatement.new(:users).build do
       add :name, String
       add :age, Int32
+      add :completed, Bool
       add :joined_at, Time
       add :amount_paid, Float
       add :email, String, optional: true
@@ -17,6 +18,7 @@ describe LuckyMigrator::CreateTableStatement do
       updated_at timestamp NOT NULL,
       name text NOT NULL,
       age int NOT NULL,
+      completed boolean NOT NULL,
       joined_at timestamp NOT NULL,
       amount_paid decimal NOT NULL,
       email text)

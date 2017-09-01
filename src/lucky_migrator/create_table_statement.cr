@@ -23,7 +23,7 @@ class LuckyMigrator::CreateTableStatement
     statement << rows.join(",\n")
   end
 
-  def add(name, type : (String | Time | Int32 | Int64 | Float).class, optional = false)
+  def add(name, type : (String | Time | Int32 | Int64 | Float | Bool).class, optional = false)
     rows << String.build do |row|
       row << "  "
       row << name.to_s
@@ -51,6 +51,10 @@ class LuckyMigrator::CreateTableStatement
 
   def column_type(type : Float.class)
     "decimal"
+  end
+
+  def column_type(type : Bool.class)
+    "boolean"
   end
 
   def null_fragment(optional)
