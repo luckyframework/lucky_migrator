@@ -1,13 +1,12 @@
 class <%= name %>::V<%= version %> < LuckyMigrator::Migration::V1
   def migrate
-    execute <<-SQL
-      # SQL GOES HERE
-    SQL
+    # create :things do
+    #  add :title, String
+    #  add :description, String, optional: true
+    # end
   end
 
   def rollback
-    execute <<-SQL
-      # SQL GOES HERE
-    SQL
+    # drop :things
   end
 end
