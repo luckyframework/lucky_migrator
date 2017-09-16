@@ -3,12 +3,12 @@ require "./spec_helper"
 describe LuckyMigrator::CreateTableStatement do
   it "can create tables" do
     statement = LuckyMigrator::CreateTableStatement.new(:users).build do
-      add :name, String
-      add :age, Int32
-      add :completed, Bool
-      add :joined_at, Time
-      add :amount_paid, Float
-      add :email, String, optional: true
+      add name : String
+      add age : Int32
+      add completed : Bool
+      add joined_at : Time
+      add amount_paid : Float
+      add email : String?
     end
 
     statement.should eq <<-SQL

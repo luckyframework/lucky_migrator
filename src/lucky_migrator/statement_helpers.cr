@@ -1,7 +1,7 @@
 module LuckyMigrator::StatementHelpers
-  macro create(table_name)
-    statement = LuckyMigrator::CreateTableStatement.new({{ table_name }}).build do
-      {{ yield }}
+  def create(table_name)
+    statement = LuckyMigrator::CreateTableStatement.new(table_name).build do
+      yield
     end
 
     execute statement
@@ -11,9 +11,9 @@ module LuckyMigrator::StatementHelpers
     execute LuckyMigrator::DropTableStatement.new(table_name).build
   end
 
-  macro alter(table_name)
-    statement = LuckyMigrator::AlterTableStatement.new({{ table_name }}).build do
-      {{ yield }}
+  def alter(table_name)
+    statement = LuckyMigrator::AlterTableStatement.new(table_name).build do
+      yield
     end
 
     execute statement

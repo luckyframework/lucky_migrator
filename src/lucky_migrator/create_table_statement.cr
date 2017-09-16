@@ -23,7 +23,15 @@ class LuckyMigrator::CreateTableStatement
     statement << rows.join(",\n")
   end
 
-  def add(name, type : (String | Time | Int32 | Int64 | Float | Bool).class, optional = false)
+  macro add(type_declaration)
+    {% if type_declaration.type.is_a?(Union) %}
+      add_column :{{ type_declaration.var }}, {{ type_declaration.type.types.first }}, optional: true
+    {% else %}
+      add_column :{{ type_declaration.var }}, {{ type_declaration.type }}
+    {% end %}
+  end
+
+  def add_column(name, type : (String | Time | Int32 | Int64 | Float | Bool).class, optional = false)
     rows << String.build do |row|
       row << "  "
       row << name.to_s
