@@ -4,6 +4,17 @@ require "lucky_cli"
 require "./src/lucky_migrator"
 require "./db/migrations/**"
 
-LuckyMigrator::Runner.db_name = "lucky_migrator_dev"
+database = "lucky_migrator_dev"
+
+LuckyRecord::Repo.configure do
+  settings.url = LuckyRecord::PostgresURL.build(
+  hostname: "localhost",
+  database: database
+  )
+end
+
+LuckyMigrator::Runner.configure do
+  settings.database = database
+end
 
 LuckyCli::Runner.run

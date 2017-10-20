@@ -4,27 +4,12 @@ require "colorize"
 
 class LuckyMigrator::Runner
   @@migrations = [] of LuckyMigrator::Migration::V1.class
-  @@db_name : String?
-
-  def self.db_name=(name)
-    @@db_name = name
+  Habitat.create do
+    setting database : String
   end
 
   def self.db_name
-    if db_name = @@db_name
-      db_name
-    else
-      raise <<-ERROR
-      Must set the db name for LuckyMigrator::Runner
-
-      This is typically done in your tasks.cr file
-
-      Example:
-
-          LuckyMigrator::Runner.db_name = "my_db_name"
-
-      ERROR
-    end
+    settings.database
   end
 
   def self.migrations
@@ -34,17 +19,16 @@ class LuckyMigrator::Runner
   def self.drop_db
     db_command = "DROP DATABASE #{self.db_name}"
 
-    DB.open("postgres://localhost") do |db|
+    DB.open(LuckyRecord::Repo.settings.url) do |db|
       db.exec db_command
     end
   end
 
   def self.create_db
-    db_command = "CREATE DATABASE #{self.db_name}"
-
-    DB.open("postgres://localhost") do |db|
-      db.exec db_command
-    end
+    Process.run "createdb #{self.db_name}",
+      shell: true,
+      output: true,
+      error: true
   end
 
   def run_pending_migrations
@@ -79,7 +63,7 @@ class LuckyMigrator::Runner
   end
 
   private def setup_migration_tracking_tables
-    DB.open("postgres://localhost/#{self.class.db_name}") do |db|
+    DB.open(LuckyRecord::Repo.settings.url) do |db|
       db.exec create_table_for_tracking_migrations
     end
   end

@@ -44,7 +44,7 @@ abstract class LuckyMigrator::Migration::V1
   end
 
   def migrated?
-    DB.open("postgres://localhost/#{LuckyMigrator::Runner.db_name}") do |db|
+    DB.open(LuckyRecord::Repo.settings.url) do |db|
       db.query_one? "SELECT id FROM migrations WHERE version = $1", version, as: Int32
     end
   end
@@ -58,7 +58,7 @@ abstract class LuckyMigrator::Migration::V1
   end
 
   private def execute(*args)
-    DB.open("postgres://localhost/#{LuckyMigrator::Runner.db_name}") do |db|
+    DB.open(LuckyRecord::Repo.settings.url) do |db|
       db.exec *args
     end
   end
