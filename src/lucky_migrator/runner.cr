@@ -17,15 +17,15 @@ class LuckyMigrator::Runner
   end
 
   def self.drop_db
-    db_command = "DROP DATABASE #{self.db_name}"
-
-    DB.open(LuckyRecord::Repo.settings.url) do |db|
-      db.exec db_command
-    end
+    run "dropdb #{self.db_name}"
   end
 
   def self.create_db
-    Process.run "createdb #{self.db_name}",
+    run "createdb #{self.db_name}"
+  end
+
+  def self.run(command : String)
+    Process.run command,
       shell: true,
       output: true,
       error: true
