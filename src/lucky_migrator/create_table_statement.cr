@@ -1,8 +1,11 @@
 class LuckyMigrator::CreateTableStatement
   getter statement = IO::Memory.new
   getter rows = [] of String
+  getter indexes = [] of String
+  getter table_name : Symbol
 
   def initialize(@table_name : Symbol)
+    table_name = @table_name
   end
 
   def build
@@ -15,7 +18,8 @@ class LuckyMigrator::CreateTableStatement
     statement << "\n"
     with self yield
     process_rows
-    statement << ")"
+    statement << ")\n"
+    add_indexes
     statement.to_s
   end
 
@@ -23,11 +27,26 @@ class LuckyMigrator::CreateTableStatement
     statement << rows.join(",\n")
   end
 
-  macro add(type_declaration)
+  private def add_indexes
+    statement << indexes.join("\n")
+  end
+
+  # Generates raw sql from a type declaration and options passed in as named
+  # variables.
+  macro add(type_declaration, index = false, using = "btree", unique = false)
     {% if type_declaration.type.is_a?(Union) %}
       add_column :{{ type_declaration.var }}, {{ type_declaration.type.types.first }}, optional: true
     {% else %}
       add_column :{{ type_declaration.var }}, {{ type_declaration.type }}
+    {% end %}
+
+    {% if index %}
+      %index_str = "CREATE"
+      {% if unique %}
+        %index_str += " UNIQUE"
+      {% end %}
+      %index_str += " INDEX #{table_name}_{{ type_declaration.var }}_index ON #{table_name} USING {{ using.id }} ({{ type_declaration.var }});"
+      indexes.push(%index_str)
     {% end %}
   end
 
