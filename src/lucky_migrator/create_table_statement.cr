@@ -61,7 +61,7 @@ class LuckyMigrator::CreateTableStatement
   def add_index(column : String | Symbol, unique = false, using : String | Symbol = "btree")
     raise "index type '#{using}' not supported" unless ALLOWED_INDEX_TYPES.includes?(using.to_s)
 
-    index = IndexDefinition.new(@table_name, column, using, unique).build
+    index = CreateIndexStatement.new(@table_name, column, using, unique).build
     indices << index unless index_added?(index, column)
   end
 

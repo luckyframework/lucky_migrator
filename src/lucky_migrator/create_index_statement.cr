@@ -7,7 +7,7 @@
 # IndexDefinition.new(:users, column: :email, using: :btree, unique: true).build
 # # => "  CREATE UNIQUE INDEX users_email_index ON users USING btree (email);"
 # ```
-struct IndexDefinition
+struct LuckyMigrator::CreateIndexStatement
   def initialize(@table : Symbol, @column : String | Symbol, @using : String | Symbol, @unique = false)
   end
 
