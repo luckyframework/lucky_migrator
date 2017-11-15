@@ -29,6 +29,7 @@ describe LuckyMigrator::CreateTableStatement do
     it "can create tables with indices" do
       statement = LuckyMigrator::CreateTableStatement.new(:users).build do
         add name : String, index: true
+        add age : Int32, unique: true
         add email : String
 
         add_index :email, unique: true
@@ -40,8 +41,10 @@ describe LuckyMigrator::CreateTableStatement do
         created_at timestamp NOT NULL,
         updated_at timestamp NOT NULL,
         name text NOT NULL,
+        age int NOT NULL,
         email text NOT NULL)
         CREATE INDEX users_name_index ON users USING btree (name);
+        CREATE UNIQUE INDEX users_age_index ON users USING btree (age);
         CREATE UNIQUE INDEX users_email_index ON users USING btree (email);
       SQL
     end

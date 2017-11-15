@@ -42,7 +42,7 @@ class LuckyMigrator::CreateTableStatement
       add_column :{{ type_declaration.var }}, {{ type_declaration.type }}
     {% end %}
 
-    {% if index %}
+    {% if index || unique %}
       add_index "{{ type_declaration.var }}", using: {{ using }}, unique: {{ unique }}
     {% end %}
   end
