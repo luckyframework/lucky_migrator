@@ -2,10 +2,10 @@ class LuckyMigrator::CreateTableStatement
   getter statement = IO::Memory.new
   getter rows = [] of String
   getter indexes = [] of String
-  getter table_name : Symbol
+
+  ALLOWED_INLINE_INDEXES = %w[btree]
 
   def initialize(@table_name : Symbol)
-    table_name = @table_name
   end
 
   def build
@@ -18,8 +18,8 @@ class LuckyMigrator::CreateTableStatement
     statement << "\n"
     with self yield
     process_rows
-    statement << ")\n"
-    add_indexes
+    statement << ")"
+    process_indexes
     statement.to_s
   end
 
@@ -27,7 +27,9 @@ class LuckyMigrator::CreateTableStatement
     statement << rows.join(",\n")
   end
 
-  private def add_indexes
+  private def process_indexes
+    return if indexes.empty?
+    statement << "\n"
     statement << indexes.join("\n")
   end
 
@@ -41,12 +43,7 @@ class LuckyMigrator::CreateTableStatement
     {% end %}
 
     {% if index %}
-      %index_str = "CREATE"
-      {% if unique %}
-        %index_str += " UNIQUE"
-      {% end %}
-      %index_str += " INDEX #{table_name}_{{ type_declaration.var }}_index ON #{table_name} USING {{ using.id }} ({{ type_declaration.var }});"
-      indexes.push(%index_str)
+      add_index "{{ type_declaration.var }}", using: {{ using }}, unique: {{ unique }}
     {% end %}
   end
 
@@ -58,6 +55,15 @@ class LuckyMigrator::CreateTableStatement
       row << column_type(type)
       row << null_fragment(optional)
     end
+  end
+
+  def add_index(column_name : String, unique = false, using = "btree")
+    raise "index type '#{using}' not supported" unless ALLOWED_INLINE_INDEXES.includes?(using)
+
+    index_str = "CREATE"
+    index_str += " UNIQUE" if unique
+    index_str += " INDEX #{@table_name}_#{column_name}_index ON #{@table_name} USING #{using} (#{column_name});"
+    indexes.push(index_str)
   end
 
   def column_type(type : String.class)
