@@ -3,7 +3,7 @@ class LuckyMigrator::CreateTableStatement
   getter rows = [] of String
   getter indices = [] of String
 
-  ALLOWED_INLINE_INDICES = %w[btree]
+  ALLOWED_INDEX_TYPES = %w[btree]
 
   def initialize(@table_name : Symbol)
   end
@@ -59,7 +59,7 @@ class LuckyMigrator::CreateTableStatement
 
   # Generates raw sql for adding an index to a table column. Accepts 'unique' and 'using' options.
   def add_index(column_name : String | Symbol, unique = false, using : String | Symbol = "btree")
-    raise "index type '#{using}' not supported" unless ALLOWED_INLINE_INDICES.includes?(using.to_s)
+    raise "index type '#{using}' not supported" unless ALLOWED_INDEX_TYPES.includes?(using.to_s)
 
     indices << String.build do |index|
       index << "CREATE"
