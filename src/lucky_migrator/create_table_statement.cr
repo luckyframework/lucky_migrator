@@ -57,13 +57,18 @@ class LuckyMigrator::CreateTableStatement
     end
   end
 
+  # Generates raw sql for adding an index to a table column. Accepts 'unique' and 'using' options.
   def add_index(column_name : String, unique = false, using = "btree")
     raise "index type '#{using}' not supported" unless ALLOWED_INLINE_INDEXES.includes?(using)
 
-    index_str = "CREATE"
-    index_str += " UNIQUE" if unique
-    index_str += " INDEX #{@table_name}_#{column_name}_index ON #{@table_name} USING #{using} (#{column_name});"
-    indexes.push(index_str)
+    indexes << String.build do |index|
+      index << "CREATE"
+      index << " UNIQUE" if unique
+      index << " INDEX #{@table_name}_#{column_name}_index"
+      index << " ON #{@table_name}"
+      index << " USING #{using}"
+      index << " (#{column_name});"
+    end
   end
 
   def column_type(type : String.class)
