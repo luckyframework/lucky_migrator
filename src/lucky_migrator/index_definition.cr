@@ -1,4 +1,5 @@
-# Encapsulates the generation of an index string.
+# Builds an sql statement for creating an index using table name, column name,
+# index type and unique flag.
 #
 # ### Usage
 #
