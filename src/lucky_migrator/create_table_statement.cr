@@ -1,9 +1,9 @@
 class LuckyMigrator::CreateTableStatement
   getter statement = IO::Memory.new
   getter rows = [] of String
-  getter indexes = [] of String
+  getter indices = [] of String
 
-  ALLOWED_INLINE_INDEXES = %w[btree]
+  ALLOWED_INLINE_INDICES = %w[btree]
 
   def initialize(@table_name : Symbol)
   end
@@ -19,7 +19,7 @@ class LuckyMigrator::CreateTableStatement
     with self yield
     process_rows
     statement << ")"
-    process_indexes
+    process_indices
     statement.to_s
   end
 
@@ -27,10 +27,10 @@ class LuckyMigrator::CreateTableStatement
     statement << rows.join(",\n")
   end
 
-  private def process_indexes
-    return if indexes.empty?
+  private def process_indices
+    return if indices.empty?
     statement << "\n"
-    statement << indexes.join("\n")
+    statement << indices.join("\n")
   end
 
   # Generates raw sql from a type declaration and options passed in as named
@@ -59,9 +59,9 @@ class LuckyMigrator::CreateTableStatement
 
   # Generates raw sql for adding an index to a table column. Accepts 'unique' and 'using' options.
   def add_index(column_name : String, unique = false, using = "btree")
-    raise "index type '#{using}' not supported" unless ALLOWED_INLINE_INDEXES.includes?(using)
+    raise "index type '#{using}' not supported" unless ALLOWED_INLINE_INDICES.includes?(using)
 
-    indexes << String.build do |index|
+    indices << String.build do |index|
       index << "CREATE"
       index << " UNIQUE" if unique
       index << " INDEX #{@table_name}_#{column_name}_index"
