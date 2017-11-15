@@ -14,12 +14,12 @@ describe LuckyMigrator::CreateTableStatement do
     statement.should eq <<-SQL
     CREATE TABLE users (
       id serial PRIMARY KEY,
-      created_at timestamp NOT NULL,
-      updated_at timestamp NOT NULL,
+      created_at timestamptz NOT NULL,
+      updated_at timestamptz NOT NULL,
       name text NOT NULL,
       age int NOT NULL,
       completed boolean NOT NULL,
-      joined_at timestamp NOT NULL,
+      joined_at timestamptz NOT NULL,
       amount_paid decimal NOT NULL,
       email text)
     SQL
