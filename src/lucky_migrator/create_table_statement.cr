@@ -61,7 +61,15 @@ class LuckyMigrator::CreateTableStatement
   def add_index(column : String | Symbol, unique = false, using : String | Symbol = "btree")
     raise "index type '#{using}' not supported" unless ALLOWED_INDEX_TYPES.includes?(using.to_s)
 
-    IndexDefinition.new(@table_name, column, using, unique).add_to(indices)
+    index = IndexDefinition.new(@table_name, column, using, unique).build
+    indices << index unless index_added?(index, column)
+  end
+
+  # Returns false unless matching index exists. Ignores UNIQUE
+  def index_added?(index : String, column : String | Symbol)
+    return false unless indices.includes?(index) || indices.includes?(index.gsub(" UNIQUE", ""))
+    raise "index on #{@table_name}.#{column} already exists"
+    raise "index on #{@table_name}.#{column} already exists"
   end
 
   def column_type(type : String.class)
@@ -94,45 +102,5 @@ class LuckyMigrator::CreateTableStatement
     else
       " NOT NULL"
     end
-  end
-end
-
-# Encapsulates the building of an index string.
-# Provides an add_to method that accepts a reference to an array and adds the
-# index string or raises an exception if already added.
-#
-# ### Usage
-#
-# ```
-# indices = [] of String
-# IndexDefinition.new(:users, column: :email, using: :btree, unique: true).add_to(indices)
-# ```
-struct IndexDefinition
-  def initialize(@table : Symbol, @column : String | Symbol, @using : String | Symbol, @unique = false)
-  end
-
-  def to_s
-    String.build do |index|
-      index << "  CREATE"
-      index << " UNIQUE" if @unique
-      index << " INDEX #{@table}_#{@column}_index"
-      index << " ON #{@table}"
-      index << " USING #{@using}"
-      index << " (#{@column});"
-    end
-  end
-
-  def add_to(indices)
-    indices.push(to_s) unless added?(indices)
-  end
-
-  def added?(indices : Array(String))
-    raise "index on #{@table}.#{@column} already exists" if indices.includes?(to_s)
-    raise "index on #{@table}.#{@column} already exists" if indices.includes?(to_s_without_unique)
-    false
-  end
-
-  def to_s_without_unique
-    to_s.gsub(" UNIQUE", "")
   end
 end

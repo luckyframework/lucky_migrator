@@ -66,28 +66,5 @@ describe LuckyMigrator::CreateTableStatement do
         end
       end
     end
-
-    describe "IndexDefinition" do
-      it "generates correct sql" do
-        index_def = IndexDefinition.new(:users, column: :email, using: :btree, unique: true)
-        index_def.to_s.should eq "  CREATE UNIQUE INDEX users_email_index ON users USING btree (email);"
-      end
-
-      it "adds to indices and raises on duplicates" do
-        indices = [] of String
-        index_def = IndexDefinition.new(:users, column: :email, using: :btree, unique: true)
-
-        generated = "  CREATE UNIQUE INDEX users_email_index ON users USING btree (email);"
-        index_def.to_s.should eq generated
-
-        index_def.add_to(indices)
-        indices.size.should eq 1
-        indices.includes?(generated).should eq true
-
-        expect_raises Exception, "index on users.email already exists" do
-          index_def.add_to(indices)
-        end
-      end
-    end
   end
 end
