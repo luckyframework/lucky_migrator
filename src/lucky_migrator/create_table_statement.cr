@@ -105,7 +105,7 @@ end
 #
 # ```
 # indices = [] of String
-# IndexDefinition.new('users', column: 'email', using: :btree, unique: true).add_to(indices)
+# IndexDefinition.new(:users, column: :email, using: :btree, unique: true).add_to(indices)
 # ```
 struct IndexDefinition
   def initialize(@table : Symbol, @column : String | Symbol, @using : String | Symbol, @unique = false)
@@ -127,8 +127,8 @@ struct IndexDefinition
   end
 
   def added?(indices : Array(String))
-    raise "duplicate index on #{@table}.#{@column}" if indices.includes?(to_s)
-    raise "duplicate index on #{@table}.#{@column}" if indices.includes?(to_s_without_unique)
+    raise "index on #{@table}.#{@column} already exists" if indices.includes?(to_s)
+    raise "index on #{@table}.#{@column} already exists" if indices.includes?(to_s_without_unique)
     false
   end
 
