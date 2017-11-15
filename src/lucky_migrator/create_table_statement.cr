@@ -9,8 +9,8 @@ class LuckyMigrator::CreateTableStatement
     statement << <<-SQL
     CREATE TABLE #{@table_name} (
       id serial PRIMARY KEY,
-      created_at timestamp NOT NULL,
-      updated_at timestamp NOT NULL,
+      created_at timestamptz NOT NULL,
+      updated_at timestamptz NOT NULL,
     SQL
     statement << "\n"
     with self yield
@@ -46,7 +46,7 @@ class LuckyMigrator::CreateTableStatement
   end
 
   def column_type(type : Time.class)
-    "timestamp"
+    "timestamptz"
   end
 
   def column_type(type : Int32.class)
