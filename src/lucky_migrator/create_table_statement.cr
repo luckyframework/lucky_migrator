@@ -16,7 +16,7 @@ class LuckyMigrator::CreateTableStatement
     statement << "\n"
     with self yield
     process_rows
-    statement << ")"
+    statement << ");"
     process_indices
     statement.to_s
   end
