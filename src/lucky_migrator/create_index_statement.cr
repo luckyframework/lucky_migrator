@@ -1,4 +1,4 @@
-# Builds a sql statement for creating an index using table name, column name,
+# Builds an SQL statement for creating an index using table name, column name,
 # index type and unique flag.
 #
 # ### Usage
