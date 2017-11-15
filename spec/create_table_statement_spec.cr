@@ -57,7 +57,7 @@ describe LuckyMigrator::CreateTableStatement do
       end
     end
 
-    it "raises error when indexe already exists" do
+    it "raises error when index already exists" do
       expect_raises Exception, "index on users.email already exists" do
         LuckyMigrator::CreateTableStatement.new(:users).build do
           add email : String, index: true
