@@ -1,10 +1,12 @@
 module LuckyMigrator::StatementHelpers
   macro create(table_name)
-    statement = LuckyMigrator::CreateTableStatement.new({{ table_name }}).build do
+    statements = LuckyMigrator::CreateTableStatement.new({{ table_name }}).build do
       {{ yield }}
-    end
+    end.statements
 
-    execute statement
+    statements.each do |statement|
+      execute statement
+    end
   end
 
   def drop(table_name)
