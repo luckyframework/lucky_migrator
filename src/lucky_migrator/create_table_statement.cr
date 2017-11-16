@@ -68,13 +68,14 @@ class LuckyMigrator::CreateTableStatement
     {% end %}
   end
 
-  def add_column(name, type : (String | Time | Int32 | Int64 | Float | Bool).class, optional = false)
+  def add_column(name, type : (String | Time | Int32 | Int64 | Float | Bool).class, optional = false, reference = "")
     rows << String.build do |row|
       row << "  "
       row << name.to_s
       row << " "
       row << column_type(type)
       row << null_fragment(optional)
+      row << references(reference)
     end
   end
 
@@ -88,6 +89,28 @@ class LuckyMigrator::CreateTableStatement
   def index_added?(index : String, column : Symbol)
     return false unless index_statements.includes?(index) || index_statements.includes?(index.gsub(" UNIQUE", ""))
     raise "index on #{@table_name}.#{column} already exists"
+  end
+
+  # Adds a references column and index given a model class and references option.
+  macro belongs_to(model_class, references = nil)
+    {% optional = model_class.is_a?(Generic) %}
+
+    {% if optional %}
+      {% class_underscore = model_class.type_vars.first.stringify.underscore %}
+    {% else %}
+      {% class_underscore = model_class.names.first.stringify.underscore %}
+    {% end %}
+
+    {% foreign_key_name = class_underscore + "_id" %}
+    %table_name = {{ references }} ? {{ references }} : pluralize({{ class_underscore }})
+
+    add_column {{ foreign_key_name }}, Int64, {{ optional }}, %table_name
+    add_index {{ foreign_key_name }}
+  end
+
+  def pluralize(word : String)
+    return "#{word.downcase.rchop}ies" if word.ends_with?("y")
+    return "#{word.downcase}s"
   end
 
   def column_type(type : String.class)
@@ -120,5 +143,9 @@ class LuckyMigrator::CreateTableStatement
     else
       " NOT NULL"
     end
+  end
+
+  def references(table_name)
+    table_name == "" ? "" : " REFERENCES #{table_name}"
   end
 end
