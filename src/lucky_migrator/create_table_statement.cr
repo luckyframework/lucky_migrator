@@ -1,65 +1,48 @@
 class LuckyMigrator::CreateTableStatement
-  getter statements = [] of String
-  getter rows = [] of String
-  getter table_statement = ""
-  getter index_statements = [] of String
+  private getter rows = [] of String
+  private getter index_statements = [] of String
 
   def initialize(@table_name : Symbol)
   end
 
   # Accepts a block to build a table and indices using `add` and `add_index` methods.
   #
-  # The generated sql statements are aggregated in the statements getter, and the
-  # table_statement and index_statements are available individually as getters.
+  # The generated sql statements are aggregated in the `statements` method.
   #
-  # # Usage
+  # ## Usage
   #
   # ```
   # built = LuckyMigrator::CreateTableStatement.new(:users).build do
   #   add :email : String, unique: true
   # end
   #
-  # built.table_statement
-  # #=> "CREATE TABLE users (
-  #         id serial PRIMARY KEY,
-  #         created_at timestamp NOT NULL,
-  #         updated_at timestamp NOT NULL,
-  #         email text NOT NULL);",
-  #
-  # built.index_statements
-  # #=> ["  CREATE UNIQUE INDEX users_email_index ON users USING btree (email);"]
-  #
-  # build.statements
+  # built.statements
   # # => [
   #   "CREATE TABLE users (
   #     id serial PRIMARY KEY,
   #     created_at timestamp NOT NULL,
   #     updated_at timestamp NOT NULL,
   #     email text NOT NULL);",
-  #   "  CREATE UNIQUE INDEX users_email_index ON users USING btree (email);"
+  #   "CREATE UNIQUE INDEX users_email_index ON users USING btree (email);"
   # ]
   #```
-  def build
+  def build : CreateTableStatement
     with self yield
-
-    build_table_statement
-    build_index_statements
-
     self
   end
 
-  # Join rows into table_statment and push into statements array
-  private def build_table_statement
-    statement = IO::Memory.new
-    statement << initial_table_statement
-    statement << "\n"
+  def statements
+    [table_statement] + index_statements
+  end
 
-    statement << rows.join(",\n")
-    statement << ");"
+  private def table_statement
+    String.build do |statement|
+      statement << initial_table_statement
+      statement << "\n"
 
-    @table_statement = statement.to_s
-
-    statements.push(table_statement)
+      statement << rows.join(",\n")
+      statement << ");"
+    end
   end
 
   private def initial_table_statement
@@ -69,12 +52,6 @@ class LuckyMigrator::CreateTableStatement
       created_at timestamptz NOT NULL,
       updated_at timestamptz NOT NULL,
     SQL
-  end
-
-  # Push index_statements into statements array
-  private def build_index_statements
-    return if index_statements.empty?
-    index_statements.each { |index| statements.push(index) }
   end
 
   # Generates raw sql from a type declaration and options passed in as named
