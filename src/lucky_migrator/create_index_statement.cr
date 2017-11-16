@@ -5,7 +5,7 @@
 #
 # ```
 # IndexDefinition.new(:users, column: :email, using: :btree, unique: true).build
-# # => "  CREATE UNIQUE INDEX users_email_index ON users USING btree (email);"
+# # => "CREATE UNIQUE INDEX users_email_index ON users USING btree (email);"
 # ```
 class LuckyMigrator::CreateIndexStatement
   ALLOWED_INDEX_TYPES = %w[btree]
@@ -17,7 +17,7 @@ class LuckyMigrator::CreateIndexStatement
 
   def build
     String.build do |index|
-      index << "  CREATE"
+      index << "CREATE"
       index << " UNIQUE" if @unique
       index << " INDEX #{@table}_#{@column}_index"
       index << " ON #{@table}"

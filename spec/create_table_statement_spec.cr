@@ -24,8 +24,6 @@ describe LuckyMigrator::CreateTableStatement do
       amount_paid decimal NOT NULL,
       email text);
     SQL
-
-    built.table_statement.should eq built.statements.first
   end
 
   describe "indices" do
@@ -39,20 +37,18 @@ describe LuckyMigrator::CreateTableStatement do
       end
 
       built.statements.size.should eq 4
-      built.index_statements.size.should eq 3
-
-      built.table_statement.should eq <<-SQL
+      built.statements.first.should eq <<-SQL
       CREATE TABLE users (
         id serial PRIMARY KEY,
-        created_at timestamp NOT NULL,
-        updated_at timestamp NOT NULL,
+        created_at timestamptz NOT NULL,
+        updated_at timestamptz NOT NULL,
         name text NOT NULL,
         age int NOT NULL,
         email text NOT NULL);
       SQL
-      built.statements[1].should eq "  CREATE INDEX users_name_index ON users USING btree (name);"
-      built.statements[2].should eq "  CREATE UNIQUE INDEX users_age_index ON users USING btree (age);"
-      built.statements[3].should eq "  CREATE UNIQUE INDEX users_email_index ON users USING btree (email);"
+      built.statements[1].should eq "CREATE INDEX users_name_index ON users USING btree (name);"
+      built.statements[2].should eq "CREATE UNIQUE INDEX users_age_index ON users USING btree (age);"
+      built.statements[3].should eq "CREATE UNIQUE INDEX users_email_index ON users USING btree (email);"
     end
 
     it "raises error on columns with non allowed index types" do
@@ -67,7 +63,6 @@ describe LuckyMigrator::CreateTableStatement do
       expect_raises Exception, "index on users.email already exists" do
         LuckyMigrator::CreateTableStatement.new(:users).build do
           add email : String, index: true
-
           add_index :email, unique: true
         end
       end
