@@ -25,7 +25,7 @@ class LuckyMigrator::CreateTableStatement
   #     email text NOT NULL);",
   #   "CREATE UNIQUE INDEX users_email_index ON users USING btree (email);"
   # ]
-  #```
+  # ```
   def build : CreateTableStatement
     with self yield
     self
