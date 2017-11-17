@@ -68,4 +68,28 @@ describe LuckyMigrator::CreateTableStatement do
       end
     end
   end
+
+  describe "associations" do
+    it "can create associations" do
+      built = LuckyMigrator::CreateTableStatement.new(:comments).build do
+        belongs_to User
+        belongs_to Post?
+        belongs_to CategoryLabel, references: :custom_table
+      end
+
+      built.statements.first.should eq <<-SQL
+      CREATE TABLE comments (
+        id serial PRIMARY KEY,
+        created_at timestamptz NOT NULL,
+        updated_at timestamptz NOT NULL,
+        user_id bigint NOT NULL REFERENCES users,
+        post_id bigint REFERENCES posts,
+        category_label_id bigint NOT NULL REFERENCES custom_table);
+      SQL
+
+      built.statements[1].should eq "CREATE INDEX comments_user_id_index ON comments USING btree (user_id);"
+      built.statements[2].should eq "CREATE INDEX comments_post_id_index ON comments USING btree (post_id);"
+      built.statements[3].should eq "CREATE INDEX comments_category_label_id_index ON comments USING btree (category_label_id);"
+    end
+  end
 end

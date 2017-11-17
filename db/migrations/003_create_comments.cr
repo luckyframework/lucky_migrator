@@ -1,6 +1,7 @@
 class CreateComments::V20171117153222 < LuckyMigrator::Migration::V1
   def migrate
     create :comments do
+      belongs_to User, references: :users
       add author_id : Int64
     end
 
