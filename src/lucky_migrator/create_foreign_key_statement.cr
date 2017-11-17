@@ -3,11 +3,11 @@
 # ### Usage
 #
 # ```
-# CreateForeignKeyStatement.new(from: :comments, to: :users, column: :author_id, primary_key: :uid).build
-# # => "ALTER TABLE comments ADD CONSTRAINT comments_author_id_fk FOREIGN KEY (author_id) REFERENCES users (uid);"
+# CreateForeignKeyStatement.new(from: :comments, to: :users, column: :author_id, primary_key: :uid, on_delete: :cascade).build
+# # => "ALTER TABLE comments ADD CONSTRAINT comments_author_id_fk FOREIGN KEY (author_id) REFERENCES users (uid) ON DELETE CASCADE;"
 # ```
 class LuckyMigrator::CreateForeignKeyStatement
-  def initialize(@from : Symbol, @to : Symbol, @column : Symbol? = nil, @primary_key = :id)
+  def initialize(@from : Symbol, @to : Symbol, @column : Symbol? = nil, @primary_key = :id, @on_delete = :no_action)
   end
 
   def build
@@ -17,7 +17,9 @@ class LuckyMigrator::CreateForeignKeyStatement
       index << " #{@from}"
       index << " ADD CONSTRAINT #{@from}_#{foreign_key}_fk"
       index << " FOREIGN KEY (#{foreign_key})"
-      index << " REFERENCES #{@to} (#{@primary_key});"
+      index << " REFERENCES #{@to} (#{@primary_key})"
+      index << on_delete_strategy(@on_delete)
+      index << ";"
     end
   end
 
@@ -28,6 +30,16 @@ class LuckyMigrator::CreateForeignKeyStatement
       return word.rchop
     else
       return word
+    end
+  end
+
+  def on_delete_strategy(strategy : Symbol)
+    if %i[cascade restrict nullify].includes?(strategy)
+      return " ON DELETE" + " #{strategy}".upcase
+    elsif strategy == :no_action
+      return ""
+    else
+      raise "on_delete: :#{strategy} is not supported. Please use :cascade, :restrict, or :nullify"
     end
   end
 end
