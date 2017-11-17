@@ -104,8 +104,8 @@ class LuckyMigrator::CreateTableStatement
     {% foreign_key_name = underscored_class + "_id" %}
     %table_name = {{ references }} || pluralize({{ underscored_class }})
 
-    add_column {{ foreign_key_name }}, Int64, {{ optional }}, %table_name
-    add_index {{ foreign_key_name }}
+    add_column :{{ foreign_key_name }}, Int64, {{ optional }}, %table_name
+    add_index :{{ foreign_key_name }}
   end
 
   def pluralize(word : String)
