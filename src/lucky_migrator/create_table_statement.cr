@@ -68,7 +68,7 @@ class LuckyMigrator::CreateTableStatement
     {% end %}
   end
 
-  def add_column(name, type : (String | Time | Int32 | Int64 | Float | Bool).class, optional = false, reference = "")
+  def add_column(name, type : (String | Time | Int32 | Int64 | Float | Bool).class, optional = false, reference = nil)
     rows << String.build do |row|
       row << "  "
       row << name.to_s
@@ -96,21 +96,24 @@ class LuckyMigrator::CreateTableStatement
     {% optional = model_class.is_a?(Generic) %}
 
     {% if optional %}
-      {% class_underscore = model_class.type_vars.first.stringify.underscore %}
+      {% underscored_class = model_class.type_vars.first.stringify.underscore %}
     {% else %}
-      {% class_underscore = model_class.names.first.stringify.underscore %}
+      {% underscored_class = model_class.names.first.stringify.underscore %}
     {% end %}
 
-    {% foreign_key_name = class_underscore + "_id" %}
-    %table_name = {{ references }} ? {{ references }} : pluralize({{ class_underscore }})
+    {% foreign_key_name = underscored_class + "_id" %}
+    %table_name = {{ references }} || pluralize({{ underscored_class }})
 
     add_column {{ foreign_key_name }}, Int64, {{ optional }}, %table_name
     add_index {{ foreign_key_name }}
   end
 
   def pluralize(word : String)
-    return "#{word.downcase.rchop}ies" if word.ends_with?("y")
-    return "#{word.downcase}s"
+    if word.ends_with?("y")
+      "#{word.rchop}ies"
+    else
+      "#{word}s"
+    end
   end
 
   def column_type(type : String.class)
@@ -145,7 +148,11 @@ class LuckyMigrator::CreateTableStatement
     end
   end
 
-  def references(table_name)
-    table_name == "" ? "" : " REFERENCES #{table_name}"
+  def references(table_name : String)
+    if table_name
+      " REFERENCES #{table_name}"
+    else
+      ""
+    end
   end
 end
