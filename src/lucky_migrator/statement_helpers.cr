@@ -21,7 +21,7 @@ module LuckyMigrator::StatementHelpers
     execute statement
   end
 
-  def add_foreign_key(from : Symbol, to : Symbol, column : Symbol, primary_key = :id, on_delete = :no_action)
+  def add_foreign_key(from : Symbol, to : Symbol, column : Symbol, primary_key = :id, on_delete = :do_nothing)
     execute CreateForeignKeyStatement.new(from, to, column, primary_key, on_delete).build
   end
 end

@@ -7,7 +7,9 @@
 # # => "ALTER TABLE comments ADD CONSTRAINT comments_author_id_fk FOREIGN KEY (author_id) REFERENCES users (uid) ON DELETE CASCADE;"
 # ```
 class LuckyMigrator::CreateForeignKeyStatement
-  def initialize(@from : Symbol, @to : Symbol, @column : Symbol? = nil, @primary_key = :id, @on_delete = :no_action)
+  ALLOWED_ON_DELETE_STRATEGIES = %i[cascade restrict nullify]
+
+  def initialize(@from : Symbol, @to : Symbol, @column : Symbol? = nil, @primary_key = :id, @on_delete = :do_nothing)
   end
 
   def build
@@ -34,12 +36,12 @@ class LuckyMigrator::CreateForeignKeyStatement
   end
 
   def on_delete_strategy(strategy : Symbol)
-    if %i[cascade restrict nullify].includes?(strategy)
+    if ALLOWED_ON_DELETE_STRATEGIES.includes?(strategy)
       return " ON DELETE" + " #{strategy}".upcase
-    elsif strategy == :no_action
+    elsif strategy == :do_nothing
       return ""
     else
-      raise "on_delete: :#{strategy} is not supported. Please use :cascade, :restrict, or :nullify"
+      raise "on_delete: :#{strategy} is not supported. Please use :do_nothing, :cascade, :restrict, or :nullify"
     end
   end
 end

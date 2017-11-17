@@ -10,7 +10,7 @@ describe LuckyMigrator::CreateForeignKeyStatement do
   end
 
   it "raises error on invalid on_delete strategy" do
-    expect_raises Exception, "on_delete: :cascad is not supported. Please use :cascade, :restrict, or :nullify" do
+    expect_raises Exception, "on_delete: :cascad is not supported. Please use :do_nothing, :cascade, :restrict, or :nullify" do
       LuckyMigrator::CreateForeignKeyStatement.new(:comments, :users, on_delete: :cascad).build
     end
   end
