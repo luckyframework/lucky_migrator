@@ -1,4 +1,6 @@
 class LuckyMigrator::CreateTableStatement
+  ALLOWED_ON_DELETE_STRATEGIES = %i[cascade restrict nullify]
+
   private getter rows = [] of String
   private getter index_statements = [] of String
 
@@ -13,6 +15,7 @@ class LuckyMigrator::CreateTableStatement
   #
   # ```
   # built = LuckyMigrator::CreateTableStatement.new(:users).build do
+  #   belongs_to Account, on_delete: :cascade
   #   add :email : String, unique: true
   # end
   #
@@ -22,6 +25,7 @@ class LuckyMigrator::CreateTableStatement
   #     id serial PRIMARY KEY,
   #     created_at timestamp NOT NULL,
   #     updated_at timestamp NOT NULL,
+  #     account_id bigint NOT NULL REFERENCES accounts (id) ON DELETE CASCADE,
   #     email text NOT NULL);",
   #   "CREATE UNIQUE INDEX users_email_index ON users USING btree (email);"
   # ]
@@ -68,14 +72,14 @@ class LuckyMigrator::CreateTableStatement
     {% end %}
   end
 
-  def add_column(name, type : (String | Time | Int32 | Int64 | Float | Bool).class, optional = false, reference = nil)
+  def add_column(name, type : (String | Time | Int32 | Int64 | Float | Bool).class, optional = false, reference = nil, on_delete = :do_nothing)
     rows << String.build do |row|
       row << "  "
       row << name.to_s
       row << " "
       row << column_type(type)
       row << null_fragment(optional)
-      row << references(reference)
+      row << references(reference, on_delete)
     end
   end
 
@@ -92,7 +96,7 @@ class LuckyMigrator::CreateTableStatement
   end
 
   # Adds a references column and index given a model class and references option.
-  macro belongs_to(model_class, references = nil)
+  macro belongs_to(model_class, references = nil, on_delete = :do_nothing)
     {% optional = model_class.is_a?(Generic) %}
 
     {% if optional %}
@@ -104,7 +108,7 @@ class LuckyMigrator::CreateTableStatement
     {% foreign_key_name = underscored_class + "_id" %}
     %table_name = {{ references }} || pluralize({{ underscored_class }})
 
-    add_column :{{ foreign_key_name }}, Int64, {{ optional }}, %table_name
+    add_column :{{ foreign_key_name }}, Int64, {{ optional }}, reference: %table_name, on_delete: {{ on_delete }}
     add_index :{{ foreign_key_name }}
   end
 
@@ -148,11 +152,15 @@ class LuckyMigrator::CreateTableStatement
     end
   end
 
-  def references(table_name : String | Symbol | Nil)
-    if table_name
-      " REFERENCES #{table_name}"
-    else
+  def references(table_name : String | Symbol | Nil, on_delete = :do_nothing)
+    if table_name.nil?
       ""
+    elsif on_delete == :do_nothing
+      " REFERENCES #{table_name}"
+    elsif ALLOWED_ON_DELETE_STRATEGIES.includes?(on_delete)
+      " REFERENCES #{table_name}" + " ON DELETE " + "#{on_delete}".upcase
+    else
+      raise "on_delete: :#{on_delete} is not supported. Please use :do_nothing, :cascade, :restrict, or :nullify"
     end
   end
 end
