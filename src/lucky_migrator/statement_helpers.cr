@@ -20,4 +20,8 @@ module LuckyMigrator::StatementHelpers
 
     execute statement
   end
+
+  def add_foreign_key(from : Symbol, to : Symbol, column : Symbol, primary_key = :id)
+    execute CreateForeignKeyStatement.new(from, to, column, primary_key).build
+  end
 end
