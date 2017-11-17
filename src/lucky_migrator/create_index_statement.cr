@@ -10,7 +10,8 @@
 class LuckyMigrator::CreateIndexStatement
   ALLOWED_INDEX_TYPES = %w[btree]
 
-  def initialize(@table : Symbol, @column : String | Symbol, @using : String | Symbol, @unique = false)
+  def initialize(@table : Symbol, @column : String | Symbol, @using : String | Symbol = :btree, @unique = false)
+
     raise "index type '#{using}' not supported" unless ALLOWED_INDEX_TYPES.includes?(using.to_s)
   end
 
