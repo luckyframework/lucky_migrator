@@ -84,7 +84,7 @@ describe LuckyMigrator::CreateTableStatement do
         updated_at timestamptz NOT NULL,
         user_id bigint NOT NULL REFERENCES users,
         post_id bigint REFERENCES posts,
-        category_id bigint NOT NULL REFERENCES custom_table);
+        category_label_id bigint NOT NULL REFERENCES custom_table);
       SQL
 
       built.index_statements.first.should eq "  CREATE INDEX comments_user_id_index ON comments USING btree (user_id);"

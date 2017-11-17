@@ -148,7 +148,7 @@ class LuckyMigrator::CreateTableStatement
     end
   end
 
-  def references(table_name : String)
+  def references(table_name : String | Symbol | Nil)
     if table_name
       " REFERENCES #{table_name}"
     else
