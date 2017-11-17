@@ -3,15 +3,15 @@
 # ### Usage
 #
 # ```
-# CreateForeignKeyStatement.new(from: :comments, to: :users, primary_key: :id).build
-# # => "ALTER TABLE comments ADD CONSTRAINT comments_user_id_fk FOREIGN KEY (user_id) REFERENCES users (id);"
+# CreateForeignKeyStatement.new(from: :comments, to: :users, column: :author_id, primary_key: :uid).build
+# # => "ALTER TABLE comments ADD CONSTRAINT comments_author_id_fk FOREIGN KEY (author_id) REFERENCES users (uid);"
 # ```
 class LuckyMigrator::CreateForeignKeyStatement
-  def initialize(@from : Symbol, @to : Symbol, @primary_key = :id)
+  def initialize(@from : Symbol, @to : Symbol, @column : Symbol? = nil, @primary_key = :id)
   end
 
   def build
-    foreign_key = singularize(@to.to_s) + "_id"
+    foreign_key = @column || singularize(@to.to_s) + "_id"
     String.build do |index|
       index << "ALTER TABLE"
       index << " #{@from}"
