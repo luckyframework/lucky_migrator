@@ -1,6 +1,4 @@
 class LuckyMigrator::CreateTableStatement
-  ALLOWED_ON_DELETE_STRATEGIES = %i[cascade restrict nullify]
-
   private getter rows = [] of String
   private getter index_statements = [] of String
 
@@ -157,7 +155,7 @@ class LuckyMigrator::CreateTableStatement
       ""
     elsif on_delete == :do_nothing
       " REFERENCES #{table_name}"
-    elsif ALLOWED_ON_DELETE_STRATEGIES.includes?(on_delete)
+    elsif CreateForeignKeyStatement::ALLOWED_ON_DELETE_STRATEGIES.includes?(on_delete)
       " REFERENCES #{table_name}" + " ON DELETE " + "#{on_delete}".upcase
     else
       raise "on_delete: :#{on_delete} is not supported. Please use :do_nothing, :cascade, :restrict, or :nullify"
