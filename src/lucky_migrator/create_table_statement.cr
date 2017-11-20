@@ -58,13 +58,13 @@ class LuckyMigrator::CreateTableStatement
 
   # Generates raw sql from a type declaration and options passed in as named
   # variables.
-  macro add(type_declaration, index = false, using = :btree, unique = false, **type_options)
-    {% options = type_options.empty? ? nil : type_options %}
+  macro add(type_declaration, index = false, using = :btree, unique = false, default = nil, **type_options)
+    {% options = type_options.empty? ? nil : type_options %})
 
     {% if type_declaration.type.is_a?(Union) %}
-      add_column :{{ type_declaration.var }}, {{ type_declaration.type.types.first }}, optional: true, options: {{ options }}
+      add_column :{{ type_declaration.var }}, {{ type_declaration.type.types.first }}, optional: true, default: {{ default }}, options: {{ options }}
     {% else %}
-      add_column :{{ type_declaration.var }}, {{ type_declaration.type }}, options: {{ options }}
+      add_column :{{ type_declaration.var }}, {{ type_declaration.type }}, default: {{ default }}, options: {{ options }}
     {% end %}
 
     {% if index || unique %}
@@ -72,7 +72,7 @@ class LuckyMigrator::CreateTableStatement
     {% end %}
   end
 
-  def add_column(name, type : (String | Time | Int32 | Int64 | Float | Bool).class, optional = false, reference = nil, on_delete = :do_nothing, options : NamedTuple? = nil)
+  def add_column(name, type : (String | Time | Int32 | Int64 | Float | Bool).class, optional = false, reference = nil, on_delete = :do_nothing,default : String | Time | Int32 | Int64 | Float | Bool | Symbol | Nil = nil, options : NamedTuple? = nil)
 
     if options
       column_type_with_options = column_type(type, **options)
@@ -86,6 +86,7 @@ class LuckyMigrator::CreateTableStatement
       row << " "
       row << column_type_with_options
       row << null_fragment(optional)
+      row << default_value(type, default, name) unless default.nil?
       row << references(reference, on_delete)
     end
   end
@@ -125,6 +126,40 @@ class LuckyMigrator::CreateTableStatement
     else
       "#{word}s"
     end
+  end
+
+  def default_value(type : String.class, default : String, name)
+    if %w[now() current_time current_timestamp].includes?(default.downcase)
+      return " DEFAULT NOW()"
+    end
+    return " DEFAULT '#{default}'"
+  end
+
+  def default_value(type : Time.class, default : (String | Time | Symbol), name)
+    if default.is_a?(Symbol) && default == :now
+      " DEFAULT NOW()"
+    elsif default.is_a?(String)
+      if %w[now() current_time current_timestamp].includes?(default.downcase)
+        " DEFAULT NOW()"
+      end
+    elsif default.is_a?(Time)
+      " DEFAULT '#{default.to_utc}'"
+    else
+      raise "Unrecognized default value for #{name}: #{default}"
+    end
+  end
+
+  # TODO: check if Int64 default value overflows or breaks when inserted into int data type
+  def default_value(type : (Int32 | Int64).class, default : (Int32 | Int64), name)
+    " DEFAULT #{default}"
+  end
+
+  def default_value(type : Bool.class, default : Bool, name)
+    " DEFAULT #{default}"
+  end
+
+  def default_value(type : Float.class, default : (Int32 | Int64 | Float), name)
+    " DEFAULT #{default.to_f}"
   end
 
   def column_type(type : String.class)

@@ -26,6 +26,37 @@ describe LuckyMigrator::CreateTableStatement do
     SQL
   end
 
+  it "sets default values" do
+    future_time = Time.new(2030,1,1)
+
+    built = LuckyMigrator::CreateTableStatement.new(:users).build do
+      add name : String, default: "name"
+      add email : String?, default: "optional"
+      add age : Int32, default: 1
+      add num : Int64, default: 1
+      add amount_paid : Float, default: 1.0
+      add completed : Bool, default: false
+      add joined_at : Time, default: :now
+      add future_time : Time, default: future_time
+    end
+
+    built.statements.size.should eq 1
+    built.statements.first.should eq <<-SQL
+    CREATE TABLE users (
+      id serial PRIMARY KEY,
+      created_at timestamptz NOT NULL,
+      updated_at timestamptz NOT NULL,
+      name text NOT NULL DEFAULT 'name',
+      email text DEFAULT 'optional',
+      age int NOT NULL DEFAULT 1,
+      num bigint NOT NULL DEFAULT 1,
+      amount_paid decimal NOT NULL DEFAULT 1.0,
+      completed boolean NOT NULL DEFAULT false,
+      joined_at timestamptz NOT NULL DEFAULT NOW(),
+      future_time timestamptz NOT NULL DEFAULT '#{future_time.to_utc}');
+    SQL
+  end
+
   describe "indices" do
     it "can create tables with indices" do
       built = LuckyMigrator::CreateTableStatement.new(:users).build do
