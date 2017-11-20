@@ -62,7 +62,7 @@ describe LuckyMigrator::CreateTableStatement do
 
     expect_raises Exception, "Cannot set Int64 default for Int32 column 'age'. Either set the type to Int64 or change the default value." do
       built = LuckyMigrator::CreateTableStatement.new(:users).build do
-        add age : Int32, default: 3_000_000_000
+        add age : Int32, default: 2_147_483_648
       end
     end
   end
