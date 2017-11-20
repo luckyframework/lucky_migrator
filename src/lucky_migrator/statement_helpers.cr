@@ -28,4 +28,8 @@ module LuckyMigrator::StatementHelpers
   def create_index(table_name : Symbol, column : Symbol, unique = false, using = :btree)
     execute CreateIndexStatement.new(table_name, column, using, unique).build
   end
+
+  def drop_index(table_name : Symbol, column : Symbol)
+    execute LuckyMigrator::DropIndexStatement.new(table_name, column).build
+  end
 end
