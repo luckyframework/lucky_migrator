@@ -19,23 +19,36 @@ abstract class LuckyMigrator::Migration::V1
   abstract def migrate
   abstract def version
 
+  getter prepared_statements = [] of String
+
+  # Unless already migrated, calls migrate which in turn calls statement
+  # helpers to generate and collect SQL statements in the
+  # @prepared_statements array. Each statement is then executed in  a
+  # transaction and tracked up completion.
   def up
     if migrated?
       puts "Already migrated #{self.class.name.colorize(:cyan)}"
     else
+      reset_prepared_statements
       migrate
-      track_migration
-      puts "Migrated #{self.class.name.colorize(:green)}"
+      execute_in_transaction @prepared_statements do |tx|
+        track_migration(tx)
+        puts "Migrated #{self.class.name.colorize(:green)}"
+      end
     end
   end
 
+  # Same as #up except calls rollback method in migration.
   def down
     if pending?
       puts "Already rolled back #{self.class.name.colorize(:cyan)}"
     else
+      reset_prepared_statements
       rollback
-      untrack_migration
-      puts "Rolled back #{self.class.name.colorize(:green)}"
+      execute_in_transaction @prepared_statements do |tx|
+        untrack_migration(tx)
+        puts "Rolled back #{self.class.name.colorize(:green)}"
+      end
     end
   end
 
@@ -49,17 +62,41 @@ abstract class LuckyMigrator::Migration::V1
     end
   end
 
-  private def track_migration
-    execute "INSERT INTO migrations(version) VALUES ($1)", version
+  private def track_migration(tx : DB::Transaction)
+    tx.connection.exec "INSERT INTO migrations(version) VALUES ($1)", version
   end
 
-  private def untrack_migration
-    execute "DELETE FROM migrations WHERE version = $1", version
+  private def untrack_migration(tx : DB::Transaction)
+    tx.connection.exec "DELETE FROM migrations WHERE version = $1", version
   end
 
   private def execute(*args)
     DB.open(LuckyRecord::Repo.settings.url) do |db|
       db.exec *args
     end
+  end
+
+  # Accepts an array of SQL statements and a block. Iterates through the
+  # array, running each statement in a transaction then yields the block
+  # with the transaction as an argument.
+  #
+  # # Usage
+  #
+  # ```
+  # execute_in_transaction ["DROP TABLE comments;"] do |tx|
+  #   tx.connection.exec "DROP TABLE users;"
+  # end
+  # ```
+  private def execute_in_transaction(statements : Array(String))
+    DB.open(LuckyRecord::Repo.settings.url) do |db|
+      db.transaction do |tx|
+        statements.each { |s| tx.connection.exec s }
+        yield tx
+      end
+    end
+  end
+
+  def reset_prepared_statements
+    @prepared_statements = [] of String
   end
 end
