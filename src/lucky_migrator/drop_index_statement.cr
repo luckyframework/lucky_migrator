@@ -3,19 +3,31 @@
 # ### Usage
 #
 # ```
-# DropIndexStatement.new(:users, :email).build
-# # => "DROP INDEX users_email_index;"
+# DropIndexStatement.new(:users, :email, if_exists: true, on_delete: :cascade).build
+# # => "DROP INDEX IF EXISTS users_email_index CASCADE;"
 # ```
 class LuckyMigrator::DropIndexStatement
-  ALLOWED_INDEX_TYPES = %w[btree]
+  ALLOWED_ON_DELETE_STRATEGIES = %i[cascade restrict]
 
-  def initialize(@table : Symbol, @column : Symbol)
+  def initialize(@table : Symbol, @column : Symbol, @if_exists = false, @on_delete = :do_nothing)
   end
 
   def build
     String.build do |index|
-      index << "DROP"
-      index << " INDEX #{@table}_#{@column}_index;"
+      index << "DROP INDEX"
+      index << " IF EXISTS" if @if_exists
+      index << " #{@table}_#{@column}_index"
+      index << on_delete_strategy(@on_delete)
+    end
+  end
+
+  def on_delete_strategy(on_delete = :do_nothing)
+    if on_delete == :do_nothing
+      ";"
+    elsif ALLOWED_ON_DELETE_STRATEGIES.includes?(on_delete)
+      " #{on_delete};".upcase
+    else
+      raise "on_delete: :#{on_delete} is not supported. Please use :do_nothing, :cascade of :restrict"
     end
   end
 end
