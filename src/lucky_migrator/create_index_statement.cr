@@ -4,7 +4,7 @@
 # ### Usage
 #
 # ```
-# IndexDefinition.new(:users, column: :email, using: :btree, unique: true).build
+# CreateIndexStatement.new(:users, column: :email, using: :btree, unique: true).build
 # # => "CREATE UNIQUE INDEX users_email_index ON users USING btree (email);"
 # ```
 class LuckyMigrator::CreateIndexStatement
