@@ -138,20 +138,21 @@ class LuckyMigrator::CreateTableStatement
   def default_value(type : Time.class, default : (String | Time | Symbol), name)
     if default.is_a?(Symbol) && default == :now
       " DEFAULT NOW()"
-    elsif default.is_a?(String)
-      if %w[now() current_time current_timestamp].includes?(default.downcase)
-        " DEFAULT NOW()"
-      end
+    elsif default.is_a?(String) && %w[now() current_timestamp].includes?(default.downcase)
+      " DEFAULT NOW()"
     elsif default.is_a?(Time)
       " DEFAULT '#{default.to_utc}'"
     else
-      raise "Unrecognized default value for #{name}: #{default}"
+      raise "Unrecognized default value for #{name}: #{default}. Please use :now, 'now()' or 'current_timestamp'"
     end
   end
 
-  # TODO: check if Int64 default value overflows or breaks when inserted into int data type
   def default_value(type : (Int32 | Int64).class, default : (Int32 | Int64), name)
-    " DEFAULT #{default}"
+    if type == Int32 && default > Int32::MAX
+      raise "Cannot set Int64 default for Int32 column '#{name}'. Either set the type to Int64 or change the default value."
+    else
+      " DEFAULT #{default}"
+    end
   end
 
   def default_value(type : Bool.class, default : Bool, name)

@@ -57,6 +57,16 @@ describe LuckyMigrator::CreateTableStatement do
     SQL
   end
 
+  it "raises on Int32 column with Int64 default" do
+    future_time = Time.new(2030,1,1)
+
+    expect_raises Exception, "Cannot set Int64 default for Int32 column 'age'. Either set the type to Int64 or change the default value." do
+      built = LuckyMigrator::CreateTableStatement.new(:users).build do
+        add age : Int32, default: 3_000_000_000
+      end
+    end
+  end
+
   describe "indices" do
     it "can create tables with indices" do
       built = LuckyMigrator::CreateTableStatement.new(:users).build do
