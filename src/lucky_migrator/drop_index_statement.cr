@@ -27,7 +27,7 @@ class LuckyMigrator::DropIndexStatement
     elsif ALLOWED_ON_DELETE_STRATEGIES.includes?(on_delete)
       " #{on_delete};".upcase
     else
-      raise "on_delete: :#{on_delete} is not supported. Please use :do_nothing, :cascade of :restrict"
+      raise "on_delete: :#{on_delete} is not supported. Please use :do_nothing, :cascade or :restrict"
     end
   end
 end
