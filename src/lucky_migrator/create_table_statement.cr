@@ -149,15 +149,15 @@ class LuckyMigrator::CreateTableStatement
   end
 
   def default_value(type : Time.class, default : Time)
-    return " DEFAULT '#{default.to_utc}'"
+    " DEFAULT '#{default.to_utc}'"
   end
 
   def default_value(type : Time.class, default : Symbol)
     if default == :now
-      return " DEFAULT NOW()"
+      " DEFAULT NOW()"
+    else
+      raise "Unrecognized default value #{default} for a timestamptz. Please use :now for current timestamp."
     end
-
-    raise "Unrecognized default value #{default} for a timestamptz. Please use :now for current timestamp."
   end
 
   def column_type(type : String.class)
