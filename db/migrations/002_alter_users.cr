@@ -5,6 +5,8 @@ class AlterUsers::V002 < LuckyMigrator::Migration::V1
       add name : String
       add nickname : String?
     end
+
+    drop_index :users, :last_name, if_exists: true, on_delete: :cascade
   end
 
   def rollback
