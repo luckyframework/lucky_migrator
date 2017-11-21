@@ -27,8 +27,6 @@ describe LuckyMigrator::CreateTableStatement do
   end
 
   it "sets default values" do
-    future_time = Time.new(2030,1,1)
-
     built = LuckyMigrator::CreateTableStatement.new(:users).build do
       add name : String, default: "name"
       add email : String?, default: "optional"
@@ -37,7 +35,7 @@ describe LuckyMigrator::CreateTableStatement do
       add amount_paid : Float, default: 1.0
       add completed : Bool, default: false
       add joined_at : Time, default: :now
-      add future_time : Time, default: future_time
+      add future_time : Time, default: Time.new
     end
 
     built.statements.size.should eq 1
@@ -53,18 +51,8 @@ describe LuckyMigrator::CreateTableStatement do
       amount_paid decimal NOT NULL DEFAULT 1.0,
       completed boolean NOT NULL DEFAULT false,
       joined_at timestamptz NOT NULL DEFAULT NOW(),
-      future_time timestamptz NOT NULL DEFAULT '#{future_time.to_utc}');
+      future_time timestamptz NOT NULL DEFAULT '#{Time.new.to_utc}');
     SQL
-  end
-
-  it "raises on Int32 column with Int64 default" do
-    future_time = Time.new(2030,1,1)
-
-    expect_raises Exception, "Cannot set Int64 default for Int32 column 'age'. Either set the type to Int64 or change the default value." do
-      built = LuckyMigrator::CreateTableStatement.new(:users).build do
-        add age : Int32, default: 2_147_483_648
-      end
-    end
   end
 
   describe "indices" do

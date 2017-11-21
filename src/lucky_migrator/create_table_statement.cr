@@ -86,7 +86,7 @@ class LuckyMigrator::CreateTableStatement
       row << " "
       row << column_type_with_options
       row << null_fragment(optional)
-      row << default_value(type, default, name) unless default.nil?
+      row << default_value(type, default) unless default.nil?
       row << references(reference, on_delete)
     end
   end
@@ -128,39 +128,36 @@ class LuckyMigrator::CreateTableStatement
     end
   end
 
-  def default_value(type : String.class, default : String, name)
-    if %w[now() current_time current_timestamp].includes?(default.downcase)
-      return " DEFAULT NOW()"
-    end
-    return " DEFAULT '#{default}'"
+  def default_value(type : String.class, default : String)
+    " DEFAULT '#{default}'"
   end
 
-  def default_value(type : Time.class, default : (String | Time | Symbol), name)
-    if default.is_a?(Symbol) && default == :now
-      " DEFAULT NOW()"
-    elsif default.is_a?(String) && %w[now() current_timestamp].includes?(default.downcase)
-      " DEFAULT NOW()"
-    elsif default.is_a?(Time)
-      " DEFAULT '#{default.to_utc}'"
-    else
-      raise "Unrecognized default value for #{name}: #{default}. Please use :now, 'now()' or 'current_timestamp'"
-    end
-  end
-
-  def default_value(type : (Int32 | Int64).class, default : (Int32 | Int64), name)
-    if type == Int32 && default > Int32::MAX
-      raise "Cannot set Int64 default for Int32 column '#{name}'. Either set the type to Int64 or change the default value."
-    else
-      " DEFAULT #{default}"
-    end
-  end
-
-  def default_value(type : Bool.class, default : Bool, name)
+  def default_value(type : Int64.class, default : Int32 | Int64)
     " DEFAULT #{default}"
   end
 
-  def default_value(type : Float.class, default : (Int32 | Int64 | Float), name)
+  def default_value(type : Int32.class, default : Int32)
+    " DEFAULT #{default}"
+  end
+
+  def default_value(type : Bool.class, default : Bool)
+    " DEFAULT #{default}"
+  end
+
+  def default_value(type : Float.class, default : Float)
     " DEFAULT #{default.to_f}"
+  end
+
+  def default_value(type : Time.class, default : Time | Symbol)
+    if default.is_a?(Time)
+      return " DEFAULT '#{default.to_utc}'"
+    end
+
+    if default.is_a?(Symbol) && default == :now
+      return " DEFAULT NOW()"
+    end
+
+    raise "Unrecognized default value #{default} for a timestamptz. Please use :now for current timestamp."
   end
 
   def column_type(type : String.class)
