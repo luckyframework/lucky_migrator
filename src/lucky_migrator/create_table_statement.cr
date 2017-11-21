@@ -148,12 +148,12 @@ class LuckyMigrator::CreateTableStatement
     " DEFAULT #{default.to_f}"
   end
 
-  def default_value(type : Time.class, default : Time | Symbol)
-    if default.is_a?(Time)
-      return " DEFAULT '#{default.to_utc}'"
-    end
+  def default_value(type : Time.class, default : Time)
+    return " DEFAULT '#{default.to_utc}'"
+  end
 
-    if default.is_a?(Symbol) && default == :now
+  def default_value(type : Time.class, default : Symbol)
+    if default == :now
       return " DEFAULT NOW()"
     end
 
