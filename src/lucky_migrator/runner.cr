@@ -42,7 +42,7 @@ class LuckyMigrator::Runner
 
   def rollback_all
     setup_migration_tracking_tables
-    migrated_migrations.each &.new.down
+    migrated_migrations.reverse.each &.new.down
   end
 
   def rollback_one
