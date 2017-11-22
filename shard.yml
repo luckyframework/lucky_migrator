@@ -10,9 +10,9 @@ dependencies:
   pg:
     github: will/crystal-pg
   lucky_cli:
-    github: luckyframework/cli
+    github: luckyframework/lucky_cli
   lucky_record:
-    github: luckyframework/record
+    github: luckyframework/lucky_record
   habitat:
     github: luckyframework/habitat
 
