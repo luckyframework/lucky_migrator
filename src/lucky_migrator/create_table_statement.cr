@@ -2,6 +2,8 @@ class LuckyMigrator::CreateTableStatement
   private getter rows = [] of String
   private getter index_statements = [] of String
 
+  alias ColumnType = String | Time | Int32 | Int64 | Bool
+
   def initialize(@table_name : Symbol)
   end
 
@@ -145,7 +147,7 @@ class LuckyMigrator::CreateTableStatement
   end
 
   def default_value(type : Float.class, default : Float)
-    " DEFAULT #{default.to_f}"
+    " DEFAULT #{default}"
   end
 
   def default_value(type : Time.class, default : Time)
