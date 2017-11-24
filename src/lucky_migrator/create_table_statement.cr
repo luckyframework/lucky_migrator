@@ -2,7 +2,8 @@ class LuckyMigrator::CreateTableStatement
   private getter rows = [] of String
   private getter index_statements = [] of String
 
-  alias ColumnType = String | Time | Int32 | Int64 | Bool
+  alias ColumnType = String.class | Time.class | Int32.class | Int64.class | Bool.class | Float.class
+  alias ColumnDefaultType = String | Time | Int32 | Int64 | Bool | Symbol | Nil
 
   def initialize(@table_name : Symbol)
   end
