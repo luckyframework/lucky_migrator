@@ -155,14 +155,6 @@ class LuckyMigrator::CreateTableStatement
     "decimal(#{precision},#{scale})"
   end
 
-  def column_type(type : Float.class, precision : Int32)
-    "decimal(#{precision})"
-  end
-
-  def column_type(type : Float.class, scale : Int32)
-    "decimal(#{scale},#{scale})"
-  end
-
   def null_fragment(optional)
     if optional
       ""
