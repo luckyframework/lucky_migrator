@@ -117,18 +117,10 @@ class LuckyMigrator::CreateTableStatement
     {% end %}
 
     {% foreign_key_name = underscored_class + "_id" %}
-    %table_name = {{ references }} || pluralize({{ underscored_class }})
+    %table_name = {{ references }} || LuckyInflector::Inflector.pluralize({{ underscored_class }})
 
     add_column :{{ foreign_key_name }}, Int64, {{ optional }}, reference: %table_name, on_delete: {{ on_delete }}
     add_index :{{ foreign_key_name }}
-  end
-
-  def pluralize(word : String)
-    if word.ends_with?("y")
-      "#{word.rchop}ies"
-    else
-      "#{word}s"
-    end
   end
 
   def default_value(type : String.class, default : String)
