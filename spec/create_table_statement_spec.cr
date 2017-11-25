@@ -21,7 +21,7 @@ describe LuckyMigrator::CreateTableStatement do
       age int NOT NULL,
       completed boolean NOT NULL,
       joined_at timestamptz NOT NULL,
-      amount_paid decimal(12,12) NOT NULL,
+      amount_paid decimal(10,2) NOT NULL,
       email text);
     SQL
   end

@@ -62,7 +62,7 @@ class LuckyMigrator::CreateTableStatement
   # Generates raw sql from a type declaration and options passed in as named
   # variables.
   macro add(type_declaration, index = false, using = :btree, unique = false, default = nil, **type_options)
-    {% options = type_options.empty? ? nil : type_options %})
+    {% options = type_options.empty? ? nil : type_options %}
 
     {% if type_declaration.type.is_a?(Union) %}
       add_column :{{ type_declaration.var }}, {{ type_declaration.type.types.first }}, optional: true, default: {{ default }}, options: {{ options }}
