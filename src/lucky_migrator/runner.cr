@@ -54,11 +54,6 @@ class LuckyMigrator::Runner
     end
   end
 
-  def redo_last_migration
-    rollback_one
-    run_pending_migrations
-  end
-
   private def migrated_migrations
     @@migrations.select &.new.migrated?
   end

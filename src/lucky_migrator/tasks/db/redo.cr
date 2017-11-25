@@ -5,7 +5,8 @@ class Db::Redo < LuckyCli::Task
 
   def call
     begin
-      LuckyMigrator::Runner.new.redo_last_migration
+      Db::Rollback.new.call
+      Db::Migrate.new.call
     rescue e : PQ::PQError
       puts e.message.colorize(:red)
     end
