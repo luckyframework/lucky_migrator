@@ -3,7 +3,7 @@ class LuckyMigrator::CreateTableStatement
   private getter index_statements = [] of String
 
   alias ColumnType = String.class | Time.class | Int32.class | Int64.class | Bool.class | Float.class
-  alias ColumnDefaultType = String | Time | Int32 | Int64 | Float32 | Float64 | Bool | Symbol | Nil
+  alias ColumnDefaultType = String | Time | Int32 | Int64 | Float32 | Float64 | Bool | Symbol
 
   def initialize(@table_name : Symbol)
   end
@@ -75,7 +75,7 @@ class LuckyMigrator::CreateTableStatement
     {% end %}
   end
 
-  def add_column(name, type : ColumnType, optional = false, reference = nil, on_delete = :do_nothing, default : ColumnDefaultType = nil, options : NamedTuple? = nil)
+  def add_column(name, type : ColumnType, optional = false, reference = nil, on_delete = :do_nothing, default : ColumnDefaultType? = nil, options : NamedTuple? = nil)
 
     if options
       column_type_with_options = column_type(type, **options)
