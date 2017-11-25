@@ -58,11 +58,13 @@ class LuckyMigrator::CreateTableStatement
 
   # Generates raw sql from a type declaration and options passed in as named
   # variables.
-  macro add(type_declaration, index = false, using = :btree, unique = false)
+  macro add(type_declaration, index = false, using = :btree, unique = false, **type_options)
+    {% options = type_options.empty? ? nil : type_options %}
+
     {% if type_declaration.type.is_a?(Union) %}
-      add_column :{{ type_declaration.var }}, {{ type_declaration.type.types.first }}, optional: true
+      add_column :{{ type_declaration.var }}, {{ type_declaration.type.types.first }}, optional: true, options: {{ options }}
     {% else %}
-      add_column :{{ type_declaration.var }}, {{ type_declaration.type }}
+      add_column :{{ type_declaration.var }}, {{ type_declaration.type }}, options: {{ options }}
     {% end %}
 
     {% if index || unique %}
@@ -70,12 +72,19 @@ class LuckyMigrator::CreateTableStatement
     {% end %}
   end
 
-  def add_column(name, type : (String | Time | Int32 | Int64 | Float | Bool).class, optional = false, reference = nil, on_delete = :do_nothing)
+  def add_column(name, type : (String | Time | Int32 | Int64 | Float | Bool).class, optional = false, reference = nil, on_delete = :do_nothing, options : NamedTuple? = nil)
+
+    if options
+      column_type_with_options = column_type(type, **options)
+    else
+      column_type_with_options = column_type(type)
+    end
+
     rows << String.build do |row|
       row << "  "
       row << name.to_s
       row << " "
-      row << column_type(type)
+      row << column_type_with_options
       row << null_fragment(optional)
       row << references(reference, on_delete)
     end
@@ -134,12 +143,16 @@ class LuckyMigrator::CreateTableStatement
     "bigint"
   end
 
+  def column_type(type : Bool.class)
+    "boolean"
+  end
+
   def column_type(type : Float.class)
     "decimal"
   end
 
-  def column_type(type : Bool.class)
-    "boolean"
+  def column_type(type : Float.class, precision : Int32, scale : Int32)
+    "decimal(#{precision},#{scale})"
   end
 
   def null_fragment(optional)
