@@ -13,7 +13,7 @@ class LuckyMigrator::CreateForeignKeyStatement
   end
 
   def build
-    foreign_key = @column || singularize(@to.to_s) + "_id"
+    foreign_key = @column || LuckyInflector::Inflector.singularize(@to.to_s) + "_id"
     String.build do |index|
       index << "ALTER TABLE"
       index << " #{@from}"
@@ -22,16 +22,6 @@ class LuckyMigrator::CreateForeignKeyStatement
       index << " REFERENCES #{@to} (#{@primary_key})"
       index << on_delete_strategy(@on_delete)
       index << ";"
-    end
-  end
-
-  def singularize(word : String)
-    if word.ends_with?("ies")
-      return word.rchop("ies") + "y"
-    elsif word.ends_with?("s")
-      return word.rchop
-    else
-      return word
     end
   end
 

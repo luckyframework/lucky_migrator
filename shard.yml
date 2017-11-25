@@ -15,6 +15,8 @@ dependencies:
     github: luckyframework/lucky_record
   habitat:
     github: luckyframework/habitat
+  lucky_inflector:
+    github: luckyframework/lucky_inflector
 
 crystal: 0.19.4
 
