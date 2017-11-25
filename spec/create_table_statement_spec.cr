@@ -7,7 +7,7 @@ describe LuckyMigrator::CreateTableStatement do
       add age : Int32
       add completed : Bool
       add joined_at : Time
-      add amount_paid : Float, precision: 10, scale: 2
+      add amount_paid : Float, scale: 12
       add email : String?
     end
 
@@ -21,7 +21,7 @@ describe LuckyMigrator::CreateTableStatement do
       age int NOT NULL,
       completed boolean NOT NULL,
       joined_at timestamptz NOT NULL,
-      amount_paid decimal(10,2) NOT NULL,
+      amount_paid decimal(12,12) NOT NULL,
       email text);
     SQL
   end

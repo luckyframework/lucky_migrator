@@ -74,7 +74,7 @@ class LuckyMigrator::CreateTableStatement
 
   def add_column(name, type : (String | Time | Int32 | Int64 | Float | Bool).class, optional = false, reference = nil, on_delete = :do_nothing, options : NamedTuple? = nil)
 
-    if options.is_a?(NamedTuple)
+    if options
       column_type_with_options = column_type(type, **options)
     else
       column_type_with_options = column_type(type)
@@ -153,6 +153,14 @@ class LuckyMigrator::CreateTableStatement
 
   def column_type(type : Float.class, precision : Int32, scale : Int32)
     "decimal(#{precision},#{scale})"
+  end
+
+  def column_type(type : Float.class, precision : Int32)
+    "decimal(#{precision})"
+  end
+
+  def column_type(type : Float.class, scale : Int32)
+    "decimal(#{scale},#{scale})"
   end
 
   def null_fragment(optional)
