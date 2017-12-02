@@ -14,6 +14,26 @@ class LuckyMigrator::AlterTableStatement
   def initialize(@table_name : Symbol)
   end
 
+  # Accepts a block to alter a table using the `add` method. The generated sql
+  # statements are aggregated in the `statements` getter.
+  #
+  # ## Usage
+  #
+  # ```
+  # built = LuckyMigrator::AlterTableStatement.new(:users).build do
+  #   add name : String
+  #   add age : Int32
+  #   remove old_field
+  # end
+  #
+  # built.statements
+  # # => [
+  # "ALTER TABLE users
+  #   ADD name text NOT NULL,
+  #   ADD age int NOT NULL,
+  #   DROP old_field"
+  # ]
+  # ```
   def build
     with self yield
     self

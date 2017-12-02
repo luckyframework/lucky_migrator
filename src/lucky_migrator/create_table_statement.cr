@@ -27,8 +27,8 @@ class LuckyMigrator::CreateTableStatement
   # # => [
   #   "CREATE TABLE users (
   #     id serial PRIMARY KEY,
-  #     created_at timestamp NOT NULL,
-  #     updated_at timestamp NOT NULL,
+  #     created_at timestamptz NOT NULL,
+  #     updated_at timestamptz NOT NULL,
   #     account_id bigint NOT NULL REFERENCES accounts (id) ON DELETE CASCADE,
   #     email text NOT NULL);",
   #   "CREATE UNIQUE INDEX users_email_index ON users USING btree (email);"
