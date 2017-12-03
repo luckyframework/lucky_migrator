@@ -40,6 +40,15 @@ class LuckyMigrator::Runner
     end
   end
 
+  def run_next_migration
+    setup_migration_tracking_tables
+    if pending_migrations.empty?
+      puts "Did nothing. No pending migrations.".colorize(:green)
+    else
+      pending_migrations.first.new.up
+    end
+  end
+
   def rollback_all
     setup_migration_tracking_tables
     migrated_migrations.reverse.each &.new.down
