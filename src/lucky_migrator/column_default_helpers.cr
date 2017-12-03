@@ -1,4 +1,6 @@
 module LuckyMigrator::ColumnDefaultHelpers
+  alias ColumnDefaultType = String | Time | Int32 | Int64 | Float32 | Float64 | Bool | Symbol
+
   def default_value(type : String.class, default : String)
     " DEFAULT '#{default}'"
   end

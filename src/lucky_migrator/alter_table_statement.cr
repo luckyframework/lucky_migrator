@@ -4,9 +4,6 @@ class LuckyMigrator::AlterTableStatement
   include LuckyMigrator::ColumnTypeOptionHelpers
   include LuckyMigrator::ColumnDefaultHelpers
 
-  alias ColumnType = String.class | Time.class | Int32.class | Int64.class | Bool.class | Float.class
-  alias ColumnDefaultType = String | Time | Int32 | Int64 | Float32 | Float64 | Bool | Symbol
-
   getter statement = IO::Memory.new
   getter rows = [] of String
   getter dropped_rows = [] of String

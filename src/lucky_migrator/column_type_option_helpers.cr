@@ -1,4 +1,6 @@
 module LuckyMigrator::ColumnTypeOptionHelpers
+  alias ColumnType = String.class | Time.class | Int32.class | Int64.class | Bool.class | Float.class
+
   def column_type(type : String.class)
     "text"
   end
