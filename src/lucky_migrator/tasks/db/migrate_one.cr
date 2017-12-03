@@ -1,7 +1,7 @@
 require "colorize"
 
 class Db::MigrateOne < LuckyCli::Task
-  banner "Migrate the database"
+  banner "Run the next pending migration"
 
   def call
     begin
