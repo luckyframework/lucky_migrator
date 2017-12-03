@@ -8,6 +8,7 @@ class Db::Rollback < LuckyCli::Task
       LuckyMigrator::Runner.new.rollback_one
     rescue e : PQ::PQError
       puts e.message.colorize(:red)
+      exit(1)
     end
   end
 end

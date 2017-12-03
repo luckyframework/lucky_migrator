@@ -9,6 +9,7 @@ class Db::RollbackAll < LuckyCli::Task
       puts "Done rolling back all migrations".colorize(:green)
     rescue e : PQ::PQError
       puts e.message.colorize(:red)
+      exit(1)
     end
   end
 end
