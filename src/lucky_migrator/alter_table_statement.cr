@@ -1,4 +1,5 @@
-require "./*"
+require "./column_default_helpers"
+require "./column_type_option_helpers"
 
 class LuckyMigrator::AlterTableStatement
   include LuckyMigrator::ColumnTypeOptionHelpers
