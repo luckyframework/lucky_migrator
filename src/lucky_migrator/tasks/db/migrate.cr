@@ -8,6 +8,7 @@ class Db::Migrate < LuckyCli::Task
       LuckyMigrator::Runner.new.run_pending_migrations
     rescue e : PQ::PQError
       puts e.message.colorize(:red)
+      exit(1)
     end
   end
 end

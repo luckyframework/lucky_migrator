@@ -9,6 +9,7 @@ class Db::Create < LuckyCli::Task
       puts "Done creating #{LuckyMigrator::Runner.db_name.colorize(:green)}"
     rescue e : PQ::PQError
       puts e.message.colorize(:red)
+      exit(1)
     end
   end
 end
