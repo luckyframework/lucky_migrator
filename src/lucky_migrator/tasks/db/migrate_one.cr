@@ -1,6 +1,6 @@
 require "colorize"
 
-class Db::MigrateOne < LuckyCli::Task
+class Db::Migrate::One < LuckyCli::Task
   banner "Run the next pending migration"
 
   def call
