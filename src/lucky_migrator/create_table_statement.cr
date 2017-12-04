@@ -1,9 +1,9 @@
 class LuckyMigrator::CreateTableStatement
+  include LuckyMigrator::ColumnDefaultHelpers
+  include LuckyMigrator::ColumnTypeOptionHelpers
+
   private getter rows = [] of String
   private getter index_statements = [] of String
-
-  alias ColumnType = String.class | Time.class | Int32.class | Int64.class | Bool.class | Float.class
-  alias ColumnDefaultType = String | Time | Int32 | Int64 | Float32 | Float64 | Bool | Symbol
 
   def initialize(@table_name : Symbol)
   end
@@ -24,8 +24,8 @@ class LuckyMigrator::CreateTableStatement
   # # => [
   #   "CREATE TABLE users (
   #     id serial PRIMARY KEY,
-  #     created_at timestamp NOT NULL,
-  #     updated_at timestamp NOT NULL,
+  #     created_at timestamptz NOT NULL,
+  #     updated_at timestamptz NOT NULL,
   #     account_id bigint NOT NULL REFERENCES accounts (id) ON DELETE CASCADE,
   #     email text NOT NULL);",
   #   "CREATE UNIQUE INDEX users_email_index ON users USING btree (email);"
@@ -121,66 +121,6 @@ class LuckyMigrator::CreateTableStatement
 
     add_column :{{ foreign_key_name }}, Int64, {{ optional }}, reference: %table_name, on_delete: {{ on_delete }}
     add_index :{{ foreign_key_name }}
-  end
-
-  def default_value(type : String.class, default : String)
-    " DEFAULT '#{default}'"
-  end
-
-  def default_value(type : Int64.class, default : Int32 | Int64)
-    " DEFAULT #{default}"
-  end
-
-  def default_value(type : Int32.class, default : Int32)
-    " DEFAULT #{default}"
-  end
-
-  def default_value(type : Bool.class, default : Bool)
-    " DEFAULT #{default}"
-  end
-
-  def default_value(type : Float.class, default : Float)
-    " DEFAULT #{default}"
-  end
-
-  def default_value(type : Time.class, default : Time)
-    " DEFAULT '#{default.to_utc}'"
-  end
-
-  def default_value(type : Time.class, default : Symbol)
-    if default == :now
-      " DEFAULT NOW()"
-    else
-      raise "Unrecognized default value #{default} for a timestamptz. Please use :now for current timestamp."
-    end
-  end
-
-  def column_type(type : String.class)
-    "text"
-  end
-
-  def column_type(type : Time.class)
-    "timestamptz"
-  end
-
-  def column_type(type : Int32.class)
-    "int"
-  end
-
-  def column_type(type : Int64.class)
-    "bigint"
-  end
-
-  def column_type(type : Bool.class)
-    "boolean"
-  end
-
-  def column_type(type : Float.class)
-    "decimal"
-  end
-
-  def column_type(type : Float.class, precision : Int32, scale : Int32)
-    "decimal(#{precision},#{scale})"
   end
 
   def null_fragment(optional)

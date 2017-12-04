@@ -2,7 +2,7 @@ class AlterUsers::V002 < LuckyMigrator::Migration::V1
   def migrate
     alter :users do
       remove :first_name
-      add name : String
+      add name : String, default: "Jon"
       add nickname : String?
     end
 

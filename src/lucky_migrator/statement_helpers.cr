@@ -14,11 +14,13 @@ module LuckyMigrator::StatementHelpers
   end
 
   macro alter(table_name)
-    statement = LuckyMigrator::AlterTableStatement.new({{ table_name }}).build do
+    statements = LuckyMigrator::AlterTableStatement.new({{ table_name }}).build do
       {{ yield }}
-    end
+    end.statements
 
-    execute statement
+    statements.each do |statement|
+      execute statement
+    end
   end
 
   def create_foreign_key(from : Symbol, to : Symbol, column : Symbol, primary_key = :id, on_delete = :do_nothing)
