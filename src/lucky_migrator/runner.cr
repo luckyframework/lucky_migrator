@@ -58,7 +58,7 @@ class LuckyMigrator::Runner
   end
 
   def ensure_migrated!
-    if pending_migrations.size > 0
+    if pending_migrations.any?
       raise "There are pending migrations. Please run lucky db.migrate"
     end
   end
