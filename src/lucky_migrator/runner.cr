@@ -32,11 +32,14 @@ class LuckyMigrator::Runner
   end
 
   def run_pending_migrations
-    setup_migration_tracking_tables
-    if pending_migrations.empty?
-      puts "Did nothing. No pending migrations.".colorize(:green)
-    else
+    prepare_for_migration do
       pending_migrations.each &.new.up
+    end
+  end
+
+  def run_next_migration
+    prepare_for_migration do
+      pending_migrations.first.new.up
     end
   end
 
@@ -65,6 +68,15 @@ class LuckyMigrator::Runner
   private def setup_migration_tracking_tables
     DB.open(LuckyRecord::Repo.settings.url) do |db|
       db.exec create_table_for_tracking_migrations
+    end
+  end
+
+  private def prepare_for_migration
+    setup_migration_tracking_tables
+    if pending_migrations.empty?
+      puts "Did nothing. No pending migrations.".colorize(:green)
+    else
+      yield
     end
   end
 
