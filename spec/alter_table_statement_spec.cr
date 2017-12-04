@@ -30,7 +30,7 @@ describe LuckyMigrator::AlterTableStatement do
       add email : String?, default: "optional"
       add age : Int32, default: 1
       add num : Int64, default: 1
-      add amount_paid : Float, default: 1.0
+      add amount_paid : Float, default: 1.0, precision: 10, scale: 5
       add completed : Bool, default: false
       add joined_at : Time, default: :now
       add future_time : Time, default: Time.new
@@ -43,7 +43,7 @@ describe LuckyMigrator::AlterTableStatement do
       ADD email text DEFAULT 'optional',
       ADD age int NOT NULL DEFAULT 1,
       ADD num bigint NOT NULL DEFAULT 1,
-      ADD amount_paid decimal NOT NULL DEFAULT 1.0,
+      ADD amount_paid decimal(10,5) NOT NULL DEFAULT 1.0,
       ADD completed boolean NOT NULL DEFAULT false,
       ADD joined_at timestamptz NOT NULL DEFAULT NOW(),
       ADD future_time timestamptz NOT NULL DEFAULT '#{Time.new.to_utc}'
