@@ -36,10 +36,10 @@ module LuckyMigrator::StatementHelpers
   end
 
   def make_required(table : Symbol, column : Symbol)
-    execute LuckyMigrator::ChangeNullStatement.new(table, column, :required).build
+    execute LuckyMigrator::ChangeNullStatement.new(table, column, required: true).build
   end
 
   def make_optional(table : Symbol, column : Symbol)
-    execute LuckyMigrator::ChangeNullStatement.new(table, column, :optional).build
+    execute LuckyMigrator::ChangeNullStatement.new(table, column, required: false).build
   end
 end

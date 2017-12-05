@@ -7,19 +7,14 @@
 # # => "ALTER TABLE users ALTER COLUMN email DROP NOT NULL;"
 # ```
 class LuckyMigrator::ChangeNullStatement
-  ALLOWED_MAKE_OPTIONS = [:optional, :required]
-
-  def initialize(@table : Symbol, @column : Symbol, @make : Symbol)
-    unless ALLOWED_MAKE_OPTIONS.includes?(make)
-      raise "make ':#{make}' not supported. Please use :optional or :required."
-    end
+  def initialize(@table : Symbol, @column : Symbol, @required : Bool)
   end
 
   def build
-    if @make == :optional
-      change = "DROP"
-    else
+    if @required
       change = "SET"
+    else
+      change = "DROP"
     end
 
     String.build do |index|
