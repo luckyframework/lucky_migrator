@@ -1,0 +1,32 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: crystallang/crystal
+        environment:
+          DATABASE_URL: postgres://myapp-user@127.0.0.1/myapp-test
+      - image: postgres:9.6.2-alpine
+        environment:
+          POSTGRES_DB: myapp-test
+          POSTGRES_USER: myapp-user
+    working_directory: ~/app
+    steps:
+      - checkout
+      - run:
+          name: "Install dependencies"
+          command: crystal deps
+      - run:
+          name: "Migrate database"
+          command: crystal tasks.cr -- db.migrate
+      - run:
+          name: "Rollback the database"
+          command: crystal tasks.cr -- db.rollback_all
+      - run:
+          name: "Migrate one"
+          command: crystal tasks.cr -- db.migrate.one
+      - run:
+          name: "Migrate all ther rest"
+          command: crystal tasks.cr -- db.migrate
+      - run:
+          name: "Run specs"
+          command: crystal spec
