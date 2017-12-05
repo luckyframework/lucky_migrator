@@ -1,11 +1,12 @@
 require "./column_default_helpers"
 require "./column_type_option_helpers"
+require "./index_statement_helpers.cr"
 
 class LuckyMigrator::AlterTableStatement
+  include LuckyMigrator::IndexStatementHelpers
   include LuckyMigrator::ColumnTypeOptionHelpers
   include LuckyMigrator::ColumnDefaultHelpers
 
-  getter statement = IO::Memory.new
   getter rows = [] of String
   getter dropped_rows = [] of String
 
@@ -38,7 +39,7 @@ class LuckyMigrator::AlterTableStatement
   end
 
   def statements
-    [alter_statement]
+    [alter_statement] + index_statements
   end
 
   def alter_statement
@@ -49,7 +50,7 @@ class LuckyMigrator::AlterTableStatement
     end
   end
 
-  macro add(type_declaration, default = nil, **type_options)
+  macro add(type_declaration, index = false, using = :btree, unique = false, default = nil, **type_options)
     {% options = type_options.empty? ? nil : type_options %}
 
     {% if type_declaration.type.is_a?(Union) %}
@@ -57,10 +58,13 @@ class LuckyMigrator::AlterTableStatement
     {% else %}
       add_column :{{ type_declaration.var }}, {{ type_declaration.type }}, default: {{ default }}, options: {{ options }}
     {% end %}
+
+    {% if index || unique %}
+      add_index :{{ type_declaration.var }}, using: {{ using }}, unique: {{ unique }}
+    {% end %}
   end
 
   def add_column(name : Symbol, type : (Bool | String | Time | Int32 | Int64 | Float).class, optional = false, default : ColumnDefaultType? = nil, options : NamedTuple? = nil)
-
     if options
       column_type_with_options = column_type(type, **options)
     else

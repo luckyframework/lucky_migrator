@@ -24,19 +24,19 @@ describe LuckyMigrator::AlterTableStatement do
     SQL
   end
 
-  it "sets default values" do
+  it "sets default values and indices" do
     built = LuckyMigrator::AlterTableStatement.new(:users).build do
       add name : String, default: "name"
       add email : String?, default: "optional"
-      add age : Int32, default: 1
-      add num : Int64, default: 1
+      add age : Int32, default: 1, unique: true
+      add num : Int64, default: 1, index: true
       add amount_paid : Float, default: 1.0, precision: 10, scale: 5
       add completed : Bool, default: false
       add joined_at : Time, default: :now
       add future_time : Time, default: Time.new
     end
 
-    built.statements.size.should eq 1
+    built.statements.size.should eq 3
     built.statements.first.should eq <<-SQL
     ALTER TABLE users
       ADD name text NOT NULL DEFAULT 'name',
@@ -48,5 +48,8 @@ describe LuckyMigrator::AlterTableStatement do
       ADD joined_at timestamptz NOT NULL DEFAULT NOW(),
       ADD future_time timestamptz NOT NULL DEFAULT '#{Time.new.to_utc}'
     SQL
+
+    built.statements[1].should eq "CREATE UNIQUE INDEX users_age_index ON users USING btree (age);"
+    built.statements[2].should eq "CREATE INDEX users_num_index ON users USING btree (num);"
   end
 end
