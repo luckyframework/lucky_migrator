@@ -65,7 +65,6 @@ class LuckyMigrator::AlterTableStatement
   end
 
   def add_column(name : Symbol, type : (Bool | String | Time | Int32 | Int64 | Float).class, optional = false, default : ColumnDefaultType? = nil, options : NamedTuple? = nil)
-
     if options
       column_type_with_options = column_type(type, **options)
     else

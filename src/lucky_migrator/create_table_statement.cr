@@ -78,7 +78,6 @@ class LuckyMigrator::CreateTableStatement
   end
 
   def add_column(name, type : ColumnType, optional = false, reference = nil, on_delete = :do_nothing, default : ColumnDefaultType? = nil, options : NamedTuple? = nil)
-
     if options
       column_type_with_options = column_type(type, **options)
     else
