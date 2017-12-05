@@ -7,6 +7,7 @@ class AlterUsers::V002 < LuckyMigrator::Migration::V1
     end
 
     drop_index :users, :last_name, if_exists: true, on_delete: :cascade
+    make_optional :users, :name
   end
 
   def rollback
