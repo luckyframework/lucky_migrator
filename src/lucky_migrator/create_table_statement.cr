@@ -1,9 +1,11 @@
+require "./index_statement_helpers.cr"
+
 class LuckyMigrator::CreateTableStatement
+  include LuckyMigrator::IndexStatementHelpers
   include LuckyMigrator::ColumnDefaultHelpers
   include LuckyMigrator::ColumnTypeOptionHelpers
 
   private getter rows = [] of String
-  private getter index_statements = [] of String
 
   def initialize(@table_name : Symbol)
   end
@@ -92,18 +94,6 @@ class LuckyMigrator::CreateTableStatement
       row << default_value(type, default) unless default.nil?
       row << references(reference, on_delete)
     end
-  end
-
-  # Generates raw sql for adding an index to a table column. Accepts 'unique' and 'using' options.
-  def add_index(column : Symbol, unique = false, using : Symbol = :btree)
-    index = CreateIndexStatement.new(@table_name, column, using, unique).build
-    index_statements << index unless index_added?(index, column)
-  end
-
-  # Returns false unless matching index exists. Ignores UNIQUE
-  def index_added?(index : String, column : Symbol)
-    return false unless index_statements.includes?(index) || index_statements.includes?(index.gsub(" UNIQUE", ""))
-    raise "index on #{@table_name}.#{column} already exists"
   end
 
   # Adds a references column and index given a model class and references option.
