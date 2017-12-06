@@ -54,9 +54,12 @@ class LuckyMigrator::AlterTableStatement
     {% options = type_options.empty? ? nil : type_options %}
 
     {% if type_declaration.type.is_a?(Union) %}
-      add_column :{{ type_declaration.var }}, {{ type_declaration.type.types.first }}, optional: true, default: {{ default }}, options: {{ options }}
+      add_column :{{ type_declaration.var }}, {{ type_declaration.type.types.first }}, true, default: {{ default }}, options: {{ options }}
     {% else %}
-      add_column :{{ type_declaration.var }}, {{ type_declaration.type }}, default: {{ default }}, options: {{ options }}
+      if {{ default }}.nil?
+        raise "must provide a default value when adding a required column"
+      end
+      add_column :{{ type_declaration.var }}, {{ type_declaration.type }}, false, default: {{ default }}, options: {{ options }}
     {% end %}
 
     {% if index || unique %}
