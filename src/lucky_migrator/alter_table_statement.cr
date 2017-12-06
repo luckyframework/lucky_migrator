@@ -93,9 +93,8 @@ class LuckyMigrator::AlterTableStatement
   end
 
   def add_fill_existing_with_statements(column : Symbol, value : ColumnDefaultType)
-    val = default_value(value.class, value).gsub(" DEFAULT ", "")
     @fill_existing_with_statements = [
-      "UPDATE #{@table_name} SET #{column} = #{val};",
+      "UPDATE #{@table_name} SET #{column} = #{value_to_string(value)};",
       "ALTER TABLE #{@table_name} ALTER COLUMN #{column} SET NOT NULL;"
     ]
   end
