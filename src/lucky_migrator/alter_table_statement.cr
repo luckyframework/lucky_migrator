@@ -79,7 +79,7 @@ class LuckyMigrator::AlterTableStatement
 
     if fill_existing_with
       optional = true
-      add_fill_existing_with_statements(name, fill_existing_with)
+      add_fill_existing_with_statements(name, type, fill_existing_with)
     end
 
     rows << String.build do |row|
@@ -92,9 +92,9 @@ class LuckyMigrator::AlterTableStatement
     end
   end
 
-  def add_fill_existing_with_statements(column : Symbol, value : ColumnDefaultType)
-    @fill_existing_with_statements = [
-      "UPDATE #{@table_name} SET #{column} = #{value_to_string(value)};",
+  def add_fill_existing_with_statements(column : Symbol, type : ColumnType, value : ColumnDefaultType)
+    @fill_existing_with_statements += [
+      "UPDATE #{@table_name} SET #{column} = #{value_to_string(type, value)};",
       "ALTER TABLE #{@table_name} ALTER COLUMN #{column} SET NOT NULL;"
     ]
   end
