@@ -4,7 +4,7 @@ describe LuckyMigrator::AlterTableStatement do
   it "can alter tables with defaults, indices and options" do
     built = LuckyMigrator::AlterTableStatement.new(:users).build do
       add name : String?
-      add email : String, default: "user@lucky.com"
+      add email : String, default: "user@lucky.com", fill_existing_with: "noreply@lucky.com"
       add age : Int32, default: 1, unique: true
       add num : Int64, default: 1, index: true
       add amount_paid : Float, default: 1.0, precision: 10, scale: 5
@@ -14,11 +14,11 @@ describe LuckyMigrator::AlterTableStatement do
       remove :old_field
     end
 
-    built.statements.size.should eq 3
+    built.statements.size.should eq 5
     built.statements.first.should eq <<-SQL
     ALTER TABLE users
       ADD name text,
-      ADD email text NOT NULL DEFAULT 'user@lucky.com',
+      ADD email text DEFAULT 'user@lucky.com',
       ADD age int NOT NULL DEFAULT 1,
       ADD num bigint NOT NULL DEFAULT 1,
       ADD amount_paid decimal(10,5) NOT NULL DEFAULT 1.0,
@@ -30,10 +30,12 @@ describe LuckyMigrator::AlterTableStatement do
 
     built.statements[1].should eq "CREATE UNIQUE INDEX users_age_index ON users USING btree (age);"
     built.statements[2].should eq "CREATE INDEX users_num_index ON users USING btree (num);"
+    built.statements[3].should eq "UPDATE users SET email = 'noreply@lucky.com';"
+    built.statements[4].should eq "ALTER TABLE users ALTER COLUMN email SET NOT NULL;"
   end
 
-  it "raises when adding a required column without a default" do
-    expect_raises Exception, "must provide a default value when adding a required column" do
+  it "raises when adding a required column without a default or fill_existing_with argument" do
+    expect_raises Exception, "must provide a default value or use fill_existing_with when adding a required field to an existing table" do
       LuckyMigrator::AlterTableStatement.new(:users).build do
         add email : String
       end
