@@ -9,6 +9,7 @@ class LuckyMigrator::AlterTableStatement
 
   getter rows = [] of String
   getter dropped_rows = [] of String
+  getter fill_existing_with_statements = [] of String
 
   def initialize(@table_name : Symbol)
   end
@@ -39,7 +40,7 @@ class LuckyMigrator::AlterTableStatement
   end
 
   def statements
-    [alter_statement] + index_statements
+    [alter_statement] + index_statements + fill_existing_with_statements
   end
 
   def alter_statement
@@ -50,13 +51,18 @@ class LuckyMigrator::AlterTableStatement
     end
   end
 
-  macro add(type_declaration, index = false, using = :btree, unique = false, default = nil, **type_options)
+  macro add(type_declaration, index = false, using = :btree, unique = false, default = nil, fill_existing_with = nil, **type_options)
     {% options = type_options.empty? ? nil : type_options %}
 
     {% if type_declaration.type.is_a?(Union) %}
-      add_column :{{ type_declaration.var }}, {{ type_declaration.type.types.first }}, optional: true, default: {{ default }}, options: {{ options }}
+      add_column :{{ type_declaration.var }}, {{ type_declaration.type.types.first }}, true, {{ default }}, nil, options: {{ options }}
     {% else %}
-      add_column :{{ type_declaration.var }}, {{ type_declaration.type }}, default: {{ default }}, options: {{ options }}
+      if {{ default }}.nil? && {{ fill_existing_with }}.nil?
+        raise "You must provide a default value or use fill_existing_with when adding a required field to an existing table.\n
+          Example: add positive : Bool, fill_existing_with: false"
+      end
+
+      add_column :{{ type_declaration.var }}, {{ type_declaration.type }}, false, {{ default }}, {{ fill_existing_with}}, options: {{ options }}
     {% end %}
 
     {% if index || unique %}
@@ -64,11 +70,16 @@ class LuckyMigrator::AlterTableStatement
     {% end %}
   end
 
-  def add_column(name : Symbol, type : (Bool | String | Time | Int32 | Int64 | Float).class, optional = false, default : ColumnDefaultType? = nil, options : NamedTuple? = nil)
+  def add_column(name : Symbol, type : ColumnType, optional = false, default : ColumnDefaultType? = nil, fill_existing_with : ColumnDefaultType? = nil, options : NamedTuple? = nil)
     if options
       column_type_with_options = column_type(type, **options)
     else
       column_type_with_options = column_type(type)
+    end
+
+    if fill_existing_with
+      optional = true
+      add_fill_existing_with_statements(name, type, fill_existing_with)
     end
 
     rows << String.build do |row|
@@ -79,6 +90,13 @@ class LuckyMigrator::AlterTableStatement
       row << null_fragment(optional)
       row << default_value(type, default) unless default.nil?
     end
+  end
+
+  def add_fill_existing_with_statements(column : Symbol, type : ColumnType, value : ColumnDefaultType)
+    @fill_existing_with_statements += [
+      "UPDATE #{@table_name} SET #{column} = #{value_to_string(type, value)};",
+      "ALTER TABLE #{@table_name} ALTER COLUMN #{column} SET NOT NULL;"
+    ]
   end
 
   def remove(name : Symbol)

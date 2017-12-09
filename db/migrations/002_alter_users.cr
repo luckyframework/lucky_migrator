@@ -14,7 +14,7 @@ class AlterUsers::V002 < LuckyMigrator::Migration::V1
     alter :users do
       remove :name
       remove :nickname
-      add first_name : String
+      add first_name : String, fill_existing_with: "Jon"
     end
   end
 end
