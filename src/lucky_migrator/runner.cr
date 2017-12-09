@@ -25,10 +25,15 @@ class LuckyMigrator::Runner
   end
 
   def self.run(command : String)
-    Process.run command,
+    error_messages = IO::Memory.new
+    result = Process.run command,
       shell: true,
       output: true,
-      error: true
+      error: error_messages
+    unless result.success?
+      raise error_messages.to_s
+      exit(1)
+    end
   end
 
   def run_pending_migrations
