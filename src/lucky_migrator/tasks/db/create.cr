@@ -10,6 +10,9 @@ class Db::Create < LuckyCli::Task
     rescue e : PQ::PQError
       puts e.message.colorize(:red)
       exit(1)
+    rescue e : Exception
+      puts e.message.colorize(:red)
+      exit(1)
     end
   end
 end
