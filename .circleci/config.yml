@@ -28,5 +28,8 @@ jobs:
           name: "Migrate all ther rest"
           command: crystal tasks.cr -- db.migrate
       - run:
+          name: "Generate a migration"
+          command: crystal tasks.cr -- gen.migration TestMigration
+      - run:
           name: "Run specs"
           command: crystal spec
