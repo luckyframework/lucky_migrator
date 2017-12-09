@@ -13,15 +13,24 @@ class LuckyMigrator::MigrationGenerator
 
   def generate
     make_migrations_folder_if_missing
-    File.write(filename, contents)
+    File.write(file_path, contents)
+    puts "Created #{migration_class_name.colorize(:green)} in .#{relative_file_path.colorize(:green)}"
+  end
+
+  private def migration_class_name
+    "#{name}::V#{version}"
   end
 
   private def make_migrations_folder_if_missing
     FileUtils.mkdir_p Dir.current + "/db/migrations"
   end
 
-  private def filename
-    Dir.current + "/db/migrations/#{version}_#{name.underscore}.cr"
+  private def file_path
+    Dir.current + relative_file_path
+  end
+
+  private def relative_file_path
+    "/db/migrations/#{version}_#{name.underscore}.cr"
   end
 
   private def version
@@ -41,7 +50,6 @@ class Gen::Migration < LuckyCli::Task
       puts "Migration name is required. Example: lucky gen.migration CreateUsers".colorize(:red)
     else
       LuckyMigrator::MigrationGenerator.new(name: ARGV.first).generate
-      puts "Created migration"
     end
   end
 end
