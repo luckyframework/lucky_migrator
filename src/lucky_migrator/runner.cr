@@ -18,10 +18,24 @@ class LuckyMigrator::Runner
 
   def self.drop_db
     run "dropdb #{self.db_name}"
+  rescue e : Exception
+    if (message = e.message) && message.includes?(%("#{self.db_name}" does not exist))
+      puts "Already dropped #{self.db_name.colorize(:green)}"
+      exit(0)
+    else
+      raise e
+    end
   end
 
   def self.create_db
     run "createdb #{self.db_name}"
+  rescue e : Exception
+    if (message = e.message) && message.includes?(%("#{self.db_name}" already exists))
+      puts "Already created #{self.db_name.colorize(:green)}"
+      exit(0)
+    else
+      raise e
+    end
   end
 
   def self.run(command : String)
