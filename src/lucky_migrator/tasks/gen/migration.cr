@@ -59,13 +59,13 @@ class Gen::Migration < LuckyCli::Task
   banner "Generate a new migration"
 
   def call
-    if ARGV.first? == nil
-      puts "Migration name is required. Example: lucky gen.migration CreateUsers".colorize(:red)
-    else
-      LuckyMigrator::MigrationGenerator.new(name: ARGV.first).generate
+    LuckyMigrator.run do
+      if ARGV.first? == nil
+        puts "Migration name is required. Example: lucky gen.migration CreateUsers".colorize(:red)
+        exit(1)
+      else
+        LuckyMigrator::MigrationGenerator.new(name: ARGV.first).generate
+      end
     end
-  rescue e : Exception
-    puts e.message
-    exit(1)
   end
 end
