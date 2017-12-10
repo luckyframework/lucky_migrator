@@ -9,7 +9,7 @@
 class LuckyMigrator::CreateForeignKeyStatement
   ALLOWED_ON_DELETE_STRATEGIES = %i[cascade restrict nullify]
 
-  def initialize(@from : Symbol, @to : Symbol, @column : Symbol? = nil, @primary_key = :id, @on_delete = :do_nothing)
+  def initialize(@from : Symbol, @to : Symbol, @on_delete : Symbol, @column : Symbol? = nil, @primary_key = :id)
   end
 
   def build

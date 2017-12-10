@@ -2,10 +2,7 @@ require "./spec_helper"
 
 describe LuckyMigrator::CreateForeignKeyStatement do
   it "generates correct sql" do
-    statement = LuckyMigrator::CreateForeignKeyStatement.new(:comments, :users).build
-    statement.should eq "ALTER TABLE comments ADD CONSTRAINT comments_user_id_fk FOREIGN KEY (user_id) REFERENCES users (id);"
-
-    statement = LuckyMigrator::CreateForeignKeyStatement.new(:comments, :users, column: :author_id, primary_key: :uid, on_delete: :cascade).build
+    statement = LuckyMigrator::CreateForeignKeyStatement.new(:comments, :users, column: :author_id, on_delete: :cascade, primary_key: :uid).build
     statement.should eq "ALTER TABLE comments ADD CONSTRAINT comments_author_id_fk FOREIGN KEY (author_id) REFERENCES users (uid) ON DELETE CASCADE;"
   end
 
