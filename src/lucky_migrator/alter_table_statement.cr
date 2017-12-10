@@ -62,6 +62,10 @@ class LuckyMigrator::AlterTableStatement
           Example: add positive : Bool, fill_existing_with: false"
       end
 
+      if {{ default }} && {{ fill_existing_with }}
+        raise "cannot use both 'default' and 'fill_existing_with' arguments"
+      end
+
       add_column :{{ type_declaration.var }}, {{ type_declaration.type }}, false, {{ default }}, {{ fill_existing_with}}, options: {{ options }}
     {% end %}
 
