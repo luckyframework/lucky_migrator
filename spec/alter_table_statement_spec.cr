@@ -4,7 +4,7 @@ describe LuckyMigrator::AlterTableStatement do
   it "can alter tables with defaults, indices and options" do
     built = LuckyMigrator::AlterTableStatement.new(:users).build do
       add name : String?
-      add email : String, default: "user@lucky.com", fill_existing_with: "noreply@lucky.com"
+      add email : String, fill_existing_with: "noreply@lucky.com"
       add age : Int32, default: 1, unique: true
       add num : Int64, default: 1, index: true
       add amount_paid : Float, default: 1.0, precision: 10, scale: 5
@@ -19,7 +19,7 @@ describe LuckyMigrator::AlterTableStatement do
     built.statements.first.should eq <<-SQL
     ALTER TABLE users
       ADD name text,
-      ADD email text DEFAULT 'user@lucky.com',
+      ADD email text,
       ADD age int NOT NULL DEFAULT 1,
       ADD num bigint NOT NULL DEFAULT 1,
       ADD amount_paid decimal(10,5) NOT NULL DEFAULT 1.0,
@@ -42,6 +42,14 @@ describe LuckyMigrator::AlterTableStatement do
     expect_raises Exception, "must provide a default value or use fill_existing_with when adding a required field to an existing table" do
       LuckyMigrator::AlterTableStatement.new(:users).build do
         add email : String
+      end
+    end
+  end
+
+  it "raises when adding a required column with both a default and fill_existing_with arguments" do
+    expect_raises Exception, "cannot use both 'default' and 'fill_existing_with' arguments" do
+      LuckyMigrator::AlterTableStatement.new(:users).build do
+        add name : String, default: "default", fill_existing_with: "existing"
       end
     end
   end
