@@ -33,7 +33,7 @@ class LuckyMigrator::Runner
     if (message = e.message) && message.includes?(%("#{self.db_name}" already exists))
       puts "Already created #{self.db_name.colorize(:green)}"
       exit(0)
-    elsif (message = e.message) && message.includes?("createdb: not found") || message.include?("No command 'createdb' found")
+    elsif (message = e.message) && message.includes?("createdb: not found") || message.includes?("No command 'createdb' found")
       puts "* Try installing postgres tools if you are on macOS https://postgresapp.com/documentation/cli-tools.html
       * If you are on linux you can try running sudo apt-get udpate && sudo apt-get install postgresql postgresql-contrib
       * If you are on CI or some servers, there may already be a database created so you don't need this command"
