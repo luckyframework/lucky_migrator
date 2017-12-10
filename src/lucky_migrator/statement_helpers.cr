@@ -24,7 +24,7 @@ module LuckyMigrator::StatementHelpers
   end
 
   def create_foreign_key(from : Symbol, to : Symbol, on_delete : Symbol, column : Symbol?, primary_key = :id)
-    execute CreateForeignKeyStatement.new(from, to, column, primary_key, on_delete).build
+    execute CreateForeignKeyStatement.new(from, to, on_delete, column, primary_key).build
   end
 
   def create_index(table_name : Symbol, column : Symbol, unique = false, using = :btree)
