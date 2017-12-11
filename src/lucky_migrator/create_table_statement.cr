@@ -96,7 +96,7 @@ class LuckyMigrator::CreateTableStatement
   end
 
   # Adds a references column and index given a model class and references option.
-  macro belongs_to(model_class, references = nil, on_delete = :do_nothing)
+  macro belongs_to(model_class, on_delete, references = nil)
     {% optional = model_class.is_a?(Generic) %}
 
     {% if optional %}
@@ -110,6 +110,11 @@ class LuckyMigrator::CreateTableStatement
 
     add_column :{{ foreign_key_name }}, Int64, {{ optional }}, reference: %table_name, on_delete: {{ on_delete }}
     add_index :{{ foreign_key_name }}
+  end
+
+  macro belongs_to(_type_declaration, references = nil)
+    {% raise "Must use 'on_delete' when creating a belongs_to association.
+      Example: belongs_to User, on_delete: :cascade" %}
   end
 
   def null_fragment(optional)
