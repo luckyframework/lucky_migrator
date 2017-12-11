@@ -3,7 +3,7 @@ require "pg"
 require "colorize"
 
 class LuckyMigrator::Runner
-  include LuckyCli::TextHelpers
+  extend LuckyCli::TextHelpers
 
   @@migrations = [] of LuckyMigrator::Migration::V1.class
   Habitat.create do
@@ -39,9 +39,9 @@ class LuckyMigrator::Runner
       raise <<-ERROR
       PostgreSQL is not installed.
 
-        * If you are on macOS  you can install postgres tools from #{"https://postgresapp.com/documentation/cli-tools.html".colorize(:green)}
-        * If you are on linux you can try running #{"sudo apt-get udpate && sudo apt-get install postgresql postgresql-contrib"}.colorize(:green)
-        * If you are on CI or some servers, there may already be a database created so you don't need this command"
+        #{green_arrow} If you are on macOS  you can install postgres tools from #{"https://postgresapp.com/documentation/cli-tools.html".colorize(:green)}
+        #{green_arrow} If you are on linux you can try running #{"sudo apt-get udpate && sudo apt-get install postgresql postgresql-contrib"}.colorize(:green)
+        #{green_arrow} If you are on CI or some servers, there may already be a database created so you don't need this command"
       ERROR
     else
       raise e
