@@ -3,6 +3,8 @@ require "pg"
 require "colorize"
 
 class LuckyMigrator::Runner
+  extend LuckyCli::TextHelpers
+
   @@migrations = [] of LuckyMigrator::Migration::V1.class
   Habitat.create do
     setting database : String
@@ -33,6 +35,14 @@ class LuckyMigrator::Runner
     if (message = e.message) && message.includes?(%("#{self.db_name}" already exists))
       puts "Already created #{self.db_name.colorize(:green)}"
       exit(0)
+    elsif (message = e.message) && (message.includes?("createdb: not found") || message.includes?("No command 'createdb' found"))
+      raise <<-ERROR
+      #{message}
+
+        #{green_arrow} If you are on macOS  you can install postgres tools from #{"https://postgresapp.com/documentation/cli-tools.html".colorize(:green)}
+        #{green_arrow} If you are on linux you can try running #{"sudo apt-get udpate && sudo apt-get install postgresql postgresql-contrib"}.colorize(:green)
+        #{green_arrow} If you are on CI or some servers, there may already be a database created so you don't need this command"
+      ERROR
     else
       raise e
     end
