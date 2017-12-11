@@ -112,6 +112,11 @@ class LuckyMigrator::CreateTableStatement
     add_index :{{ foreign_key_name }}
   end
 
+  macro belongs_to(_type_declaration, references = nil)
+    {% raise "Must use 'on_delete' when creating a belongs_to association.
+      Example: belongs_to User, on_delete: :cascade" %}
+  end
+
   def null_fragment(optional)
     if optional
       ""
