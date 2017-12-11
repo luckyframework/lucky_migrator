@@ -11,15 +11,37 @@ class LuckyMigrator::Runner
   end
 
   def self.db_name
-    settings.database
+    (URI.parse(LuckyRecord::Repo.settings.url).path || "")[1..-1]
+  end
+
+  def self.db_host
+    URI.parse(LuckyRecord::Repo.settings.url).host || "localhost"
+  end
+
+  def self.db_port
+    URI.parse(LuckyRecord::Repo.settings.url).port || "5432"
+  end
+
+  def self.db_user
+    URI.parse(LuckyRecord::Repo.settings.url).user
+  end
+
+  def self.db_password
+    URI.parse(LuckyRecord::Repo.settings.url).password
   end
 
   def self.migrations
     @@migrations
   end
 
+  def self.cmd_args
+    args = ""
+    args += "-U #{self.db_user} " if self.db_user
+    args += "-h #{self.db_host} -p #{self.db_port} #{self.db_name}"
+  end
+
   def self.drop_db
-    run "dropdb #{self.db_name}"
+    run "dropdb #{self.cmd_args}"
   rescue e : Exception
     if (message = e.message) && message.includes?(%("#{self.db_name}" does not exist))
       puts "Already dropped #{self.db_name.colorize(:green)}"
@@ -30,7 +52,7 @@ class LuckyMigrator::Runner
   end
 
   def self.create_db
-    run "createdb #{self.db_name}"
+    run "createdb #{self.cmd_args}"
   rescue e : Exception
     if (message = e.message) && message.includes?(%("#{self.db_name}" already exists))
       puts "Already created #{self.db_name.colorize(:green)}"
@@ -50,10 +72,12 @@ class LuckyMigrator::Runner
 
   def self.run(command : String)
     error_messages = IO::Memory.new
+    ENV["PGPASSWORD"] = self.db_password if self.db_password
     result = Process.run command,
       shell: true,
       output: true,
       error: error_messages
+    ENV.delete("PGPASSWORD") if self.db_password
     unless result.success?
       raise error_messages.to_s
       exit(1)
