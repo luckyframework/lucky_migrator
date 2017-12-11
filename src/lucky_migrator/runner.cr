@@ -37,7 +37,7 @@ class LuckyMigrator::Runner
       exit(0)
     elsif (message = e.message) && (message.includes?("createdb: not found") || message.includes?("No command 'createdb' found"))
       raise <<-ERROR
-      PostgreSQL is not installed.
+      #{message}
 
         #{green_arrow} If you are on macOS  you can install postgres tools from #{"https://postgresapp.com/documentation/cli-tools.html".colorize(:green)}
         #{green_arrow} If you are on linux you can try running #{"sudo apt-get udpate && sudo apt-get install postgresql postgresql-contrib"}.colorize(:green)
