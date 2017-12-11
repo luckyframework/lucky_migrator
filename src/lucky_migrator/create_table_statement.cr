@@ -96,7 +96,7 @@ class LuckyMigrator::CreateTableStatement
   end
 
   # Adds a references column and index given a model class and references option.
-  macro belongs_to(model_class, references = nil, on_delete = :do_nothing)
+  macro belongs_to(model_class, on_delete, references = nil)
     {% optional = model_class.is_a?(Generic) %}
 
     {% if optional %}

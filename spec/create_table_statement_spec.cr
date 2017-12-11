@@ -102,8 +102,8 @@ describe LuckyMigrator::CreateTableStatement do
     it "can create associations" do
       built = LuckyMigrator::CreateTableStatement.new(:comments).build do
         belongs_to User, on_delete: :cascade
-        belongs_to Post?
-        belongs_to CategoryLabel, references: :custom_table
+        belongs_to Post?, on_delete: :restrict
+        belongs_to CategoryLabel, on_delete: :nullify, references: :custom_table
       end
 
       built.statements.first.should eq <<-SQL
@@ -112,8 +112,8 @@ describe LuckyMigrator::CreateTableStatement do
         created_at timestamptz NOT NULL,
         updated_at timestamptz NOT NULL,
         user_id bigint NOT NULL REFERENCES users ON DELETE CASCADE,
-        post_id bigint REFERENCES posts,
-        category_label_id bigint NOT NULL REFERENCES custom_table);
+        post_id bigint REFERENCES posts ON DELETE RESTRICT,
+        category_label_id bigint NOT NULL REFERENCES custom_table ON DELETE NULLIFY);
       SQL
 
       built.statements[1].should eq "CREATE INDEX comments_user_id_index ON comments USING btree (user_id);"
@@ -121,7 +121,7 @@ describe LuckyMigrator::CreateTableStatement do
       built.statements[3].should eq "CREATE INDEX comments_category_label_id_index ON comments USING btree (category_label_id);"
     end
 
-    it "raises error when on_delete strategy is invalid" do
+    it "raises error when on_delete strategy is invalid or nil" do
       expect_raises Exception, "on_delete: :cascad is not supported. Please use :do_nothing, :cascade, :restrict, or :nullify" do
         LuckyMigrator::CreateTableStatement.new(:users).build do
           belongs_to User, on_delete: :cascad
