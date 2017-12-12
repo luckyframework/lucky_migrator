@@ -3,6 +3,7 @@
 require "lucky_cli"
 require "./src/lucky_migrator"
 require "./db/migrations/**"
+<<<<<<< 1cacfa958cbb9e05a95c11d83ba6cd13db5d9a52
 
 database = "lucky_migrator_dev"
 
@@ -20,5 +21,8 @@ end
 LuckyMigrator::Runner.configure do
   settings.database = database
 end
+=======
+require "./config/database"
+>>>>>>> Move database and lucky_record configuration to config folder
 
 LuckyCli::Runner.run
