@@ -24,7 +24,7 @@ abstract class LuckyMigrator::Migration::V1
   # Unless already migrated, calls migrate which in turn calls statement
   # helpers to generate and collect SQL statements in the
   # @prepared_statements array. Each statement is then executed in  a
-  # transaction and tracked up completion.
+  # transaction and tracked upon completion.
   def up
     if migrated?
       puts "Already migrated #{self.class.name.colorize(:cyan)}"

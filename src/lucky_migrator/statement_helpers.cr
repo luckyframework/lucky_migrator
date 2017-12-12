@@ -32,7 +32,7 @@ module LuckyMigrator::StatementHelpers
   end
 
   def drop_index(table_name : Symbol, column : Symbol, if_exists = false, on_delete = :do_nothing)
-    execute LuckyMigrator::DropIndexStatement.new(table_name, column, if_exists, on_delete).build
+    prepared_statements << LuckyMigrator::DropIndexStatement.new(table_name, column, if_exists, on_delete).build
   end
 
   def make_required(table : Symbol, column : Symbol)
