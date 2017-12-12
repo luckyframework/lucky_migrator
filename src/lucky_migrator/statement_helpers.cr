@@ -19,7 +19,7 @@ module LuckyMigrator::StatementHelpers
     end.statements
 
     statements.each do |statement|
-      execute statement
+      prepared_statements <<  statement
     end
   end
 
@@ -36,10 +36,10 @@ module LuckyMigrator::StatementHelpers
   end
 
   def make_required(table : Symbol, column : Symbol)
-    execute LuckyMigrator::ChangeNullStatement.new(table, column, required: true).build
+    prepared_statements << LuckyMigrator::ChangeNullStatement.new(table, column, required: true).build
   end
 
   def make_optional(table : Symbol, column : Symbol)
-    execute LuckyMigrator::ChangeNullStatement.new(table, column, required: false).build
+    prepared_statements << LuckyMigrator::ChangeNullStatement.new(table, column, required: false).build
   end
 end
