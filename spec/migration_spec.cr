@@ -7,7 +7,7 @@ class MigrationThatPartiallyWorks::V999 < LuckyMigrator::Migration::V1
     end
 
     alter :table_does_not_exist do
-      add foo : String
+      add foo : String?
     end
   end
 
