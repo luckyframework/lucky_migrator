@@ -66,7 +66,7 @@ class LuckyMigrator::AlterTableStatement
         raise "cannot use both 'default' and 'fill_existing_with' arguments"
       end
 
-      add_column :{{ type_declaration.var }}, {{ type_declaration.type }}, false, {{ default }}, {{ fill_existing_with}}, options: {{ options }}
+      add_column :{{ type_declaration.var }}, {{ type_declaration.type }}, false, {{ default }}, {{ fill_existing_with }}, options: {{ options }}
     {% end %}
 
     {% if index || unique %}
@@ -99,7 +99,7 @@ class LuckyMigrator::AlterTableStatement
   def add_fill_existing_with_statements(column : Symbol, type : ColumnType, value : ColumnDefaultType)
     @fill_existing_with_statements += [
       "UPDATE #{@table_name} SET #{column} = #{value_to_string(type, value)};",
-      "ALTER TABLE #{@table_name} ALTER COLUMN #{column} SET NOT NULL;"
+      "ALTER TABLE #{@table_name} ALTER COLUMN #{column} SET NOT NULL;",
     ]
   end
 
