@@ -6,6 +6,7 @@ class LuckyMigrator::Runner
   extend LuckyCli::TextHelpers
 
   @@migrations = [] of LuckyMigrator::Migration::V1.class
+
   Habitat.create do
     setting database : String
   end
@@ -39,13 +40,21 @@ class LuckyMigrator::Runner
       raise <<-ERROR
       #{message}
 
-        #{green_arrow} If you are on macOS  you can install postgres tools from #{"https://postgresapp.com/documentation/cli-tools.html".colorize(:green)}
-        #{green_arrow} If you are on linux you can try running #{"sudo apt-get udpate && sudo apt-get install postgresql postgresql-contrib"}.colorize(:green)
+        #{green_arrow} If you are on macOS  you can install postgres tools from #{macos_postgres_tools_link}
+        #{green_arrow} If you are on linux you can try running #{linux_postgres_installation_instructions}
         #{green_arrow} If you are on CI or some servers, there may already be a database created so you don't need this command"
       ERROR
     else
       raise e
     end
+  end
+
+  private def self.macos_postgres_tools_link
+    "https://postgresapp.com/documentation/cli-tools.html".colorize(:green)
+  end
+
+  private def self.linux_postgres_installation_instructions
+    "sudo apt-get udpate && sudo apt-get install postgresql postgresql-contrib".colorize(:green)
   end
 
   def self.run(command : String)
