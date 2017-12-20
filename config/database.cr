@@ -1,7 +1,7 @@
 database = "lucky_migrator_dev"
 
 LuckyRecord::Repo.configure do
-  settings.url = ENV["DATABASE_URL"] || LuckyRecord::PostgresURL.build(
+  settings.url = ENV["DATABASE_URL"]? || LuckyRecord::PostgresURL.build(
     hostname: "localhost",
     database: database
   )
