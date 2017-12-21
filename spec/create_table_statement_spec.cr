@@ -111,9 +111,9 @@ describe LuckyMigrator::CreateTableStatement do
         id serial PRIMARY KEY,
         created_at timestamptz NOT NULL,
         updated_at timestamptz NOT NULL,
-        user_id bigint NOT NULL REFERENCES users ON DELETE CASCADE,
-        post_id bigint REFERENCES posts ON DELETE RESTRICT,
-        category_label_id bigint NOT NULL REFERENCES custom_table ON DELETE NULLIFY);
+        user_id int NOT NULL REFERENCES users ON DELETE CASCADE,
+        post_id int REFERENCES posts ON DELETE RESTRICT,
+        category_label_id int NOT NULL REFERENCES custom_table ON DELETE NULLIFY);
       SQL
 
       built.statements[1].should eq "CREATE INDEX comments_user_id_index ON comments USING btree (user_id);"
