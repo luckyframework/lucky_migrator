@@ -18,6 +18,6 @@ dependencies:
   lucky_inflector:
     github: luckyframework/lucky_inflector
 
-crystal: 0.19.4
+crystal: 0.24.1
 
 license: MIT
