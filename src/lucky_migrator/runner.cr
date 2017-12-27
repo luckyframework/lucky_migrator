@@ -61,7 +61,7 @@ class LuckyMigrator::Runner
     error_messages = IO::Memory.new
     result = Process.run command,
       shell: true,
-      output: true,
+      output: STDOUT,
       error: error_messages
     unless result.success?
       raise error_messages.to_s
