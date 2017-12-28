@@ -5,6 +5,7 @@ describe LuckyMigrator::AlterTableStatement do
     built = LuckyMigrator::AlterTableStatement.new(:users).build do
       add name : String?
       add email : String, fill_existing_with: "noreply@lucky.com"
+      add nickname : String, fill_existing_with: :nothing
       add age : Int32, default: 1, unique: true
       add num : Int64, default: 1, index: true
       add amount_paid : Float, default: 1.0, precision: 10, scale: 5
@@ -20,6 +21,7 @@ describe LuckyMigrator::AlterTableStatement do
     ALTER TABLE users
       ADD name text,
       ADD email text,
+      ADD nickname text NOT NULL,
       ADD age int NOT NULL DEFAULT 1,
       ADD num bigint NOT NULL DEFAULT 1,
       ADD amount_paid decimal(10,5) NOT NULL DEFAULT 1.0,
