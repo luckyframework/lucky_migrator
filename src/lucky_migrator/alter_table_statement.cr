@@ -62,12 +62,20 @@ class LuckyMigrator::AlterTableStatement
 
           You must provide a default value or use fill_existing_with when adding a required field to an existing table.
 
-            Example: add #{type_declaration.var} : #{type_declaration.type}, fill_existing_with: "Something"
+          Try one of these...
+
+            ▸ add #{type_declaration.var} : #{type_declaration.type}, default: "Something"
+            ▸ add #{type_declaration.var} : #{type_declaration.type}, fill_existing_with: "Something"
+            ▸ add #{type_declaration.var} : #{type_declaration.type}, fill_existing_with: :nothing
           ERROR %}
       {% end %}
 
       {% if default && fill_existing_with %}
         {% type_declaration.raise "Cannot use both 'default' and 'fill_existing_with' arguments" %}
+      {% end %}
+
+      {% if fill_existing_with == :nothing %}
+        {% fill_existing_with = nil %}
       {% end %}
 
       add_column :{{ type_declaration.var }}, {{ type_declaration.type }}, false, {{ default }}, {{ fill_existing_with }}, options: {{ options }}
