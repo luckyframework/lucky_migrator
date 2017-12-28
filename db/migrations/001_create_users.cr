@@ -10,6 +10,8 @@ class CreateUsers::V001 < LuckyMigrator::Migration::V1
       add joined_at : Time, default: :now
     end
 
+    execute "CREATE INDEX users_num_index ON users USING btree (num);"
+
     create_index :users, :last_name, unique: true
   end
 
