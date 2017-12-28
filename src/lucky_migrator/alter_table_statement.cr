@@ -57,14 +57,18 @@ class LuckyMigrator::AlterTableStatement
     {% if type_declaration.type.is_a?(Union) %}
       add_column :{{ type_declaration.var }}, {{ type_declaration.type.types.first }}, true, {{ default }}, nil, options: {{ options }}
     {% else %}
-      if {{ default }}.nil? && {{ fill_existing_with }}.nil?
-        raise "You must provide a default value or use fill_existing_with when adding a required field to an existing table.\n
-          Example: add positive : Bool, fill_existing_with: false"
-      end
+      {% if default == nil && fill_existing_with == nil %}
+        {% raise <<-ERROR
 
-      if {{ default }} && {{ fill_existing_with }}
-        raise "cannot use both 'default' and 'fill_existing_with' arguments"
-      end
+          You must provide a default value or use fill_existing_with when adding a required field to an existing table.
+
+            Example: add #{type_declaration.var} : #{type_declaration.type}, fill_existing_with: "Something"
+          ERROR %}
+      {% end %}
+
+      {% if default && fill_existing_with %}
+        {% type_declaration.raise "Cannot use both 'default' and 'fill_existing_with' arguments" %}
+      {% end %}
 
       add_column :{{ type_declaration.var }}, {{ type_declaration.type }}, false, {{ default }}, {{ fill_existing_with }}, options: {{ options }}
     {% end %}
