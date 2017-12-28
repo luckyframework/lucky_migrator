@@ -37,20 +37,4 @@ describe LuckyMigrator::AlterTableStatement do
     built.statements[5].should eq "UPDATE users SET updated_at = NOW();"
     built.statements[6].should eq "ALTER TABLE users ALTER COLUMN updated_at SET NOT NULL;"
   end
-
-  it "raises when adding a required column without a default or fill_existing_with argument" do
-    expect_raises Exception, "must provide a default value or use fill_existing_with when adding a required field to an existing table" do
-      LuckyMigrator::AlterTableStatement.new(:users).build do
-        add email : String
-      end
-    end
-  end
-
-  it "raises when adding a required column with both a default and fill_existing_with arguments" do
-    expect_raises Exception, "cannot use both 'default' and 'fill_existing_with' arguments" do
-      LuckyMigrator::AlterTableStatement.new(:users).build do
-        add name : String, default: "default", fill_existing_with: "existing"
-      end
-    end
-  end
 end
