@@ -57,7 +57,7 @@ describe LuckyMigrator::Migration::V1 do
   end
 end
 
-def get_column_names(table_name)
+private def get_column_names(table_name)
   statement = <<-SQL
   SELECT column_name as name, is_nullable::boolean as nilable
   FROM information_schema.columns
