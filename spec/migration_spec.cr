@@ -27,6 +27,7 @@ class MigrationWithOrderDependentExecute::V998 < LuckyMigrator::Migration::V1
   end
 
   def rollback
+    drop :execution_order
   end
 end
 
@@ -44,11 +45,11 @@ describe LuckyMigrator::Migration::V1 do
 
   describe "statement execution order" do
     Spec.after_each do
-      LuckyRecord::Repo.db.exec "DROP TABLE execution_order;"
+      MigrationWithOrderDependentExecute::V998.new.down(log: false)
     end
 
     it "runs execute statements in the order they were called" do
-      MigrationWithOrderDependentExecute::V998.new.up
+      MigrationWithOrderDependentExecute::V998.new.up(log: false)
       columns = get_column_names("execution_order")
       columns.includes?("new_col").should be_true
       columns.includes?("bar").should be_true
