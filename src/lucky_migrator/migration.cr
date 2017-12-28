@@ -70,10 +70,8 @@ abstract class LuckyMigrator::Migration::V1
     tx.connection.exec "DELETE FROM migrations WHERE version = $1", version
   end
 
-  private def execute(*args)
-    DB.open(LuckyRecord::Repo.settings.url) do |db|
-      db.exec *args
-    end
+  private def execute(statement : String)
+    @prepared_statements << statement
   end
 
   # Accepts an array of SQL statements and a block. Iterates through the
