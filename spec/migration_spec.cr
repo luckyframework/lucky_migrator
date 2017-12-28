@@ -42,16 +42,27 @@ describe LuckyMigrator::Migration::V1 do
     exists.should be_false
   end
 
-  pending "statement execution order" do
+  describe "statement execution order" do
     Spec.after_each do
       LuckyRecord::Repo.db.exec "DROP TABLE execution_order;"
     end
 
     it "runs execute statements in the order they were called" do
       MigrationWithOrderDependentExecute::V998.new.up
-      columns = LuckyRecord::Repo.table_columns("execution_order")
-      columns.map(&.name).should includes?("new_col")
-      columns.map(&.name).should includes?("bar")
+      columns = get_column_names("execution_order")
+      columns.includes?("new_col").should be_true
+      columns.includes?("bar").should be_true
     end
   end
+end
+
+def get_column_names(table_name)
+  statement = <<-SQL
+  SELECT column_name as name, is_nullable::boolean as nilable
+  FROM information_schema.columns
+  WHERE table_schema = 'public'
+    AND table_name = '#{table_name}'
+  SQL
+
+  LuckyRecord::Repo.run { |db| db.query_all statement, as: String }
 end
