@@ -54,7 +54,7 @@ class LuckyMigrator::Runner
   end
 
   private def self.linux_postgres_installation_instructions
-    "sudo apt-get udpate && sudo apt-get install postgresql postgresql-contrib".colorize(:green)
+    "sudo apt-get update && sudo apt-get install postgresql postgresql-contrib".colorize(:green)
   end
 
   def self.run(command : String)
