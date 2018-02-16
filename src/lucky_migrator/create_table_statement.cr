@@ -96,16 +96,19 @@ class LuckyMigrator::CreateTableStatement
   end
 
   # Adds a references column and index given a model class and references option.
-  macro add_belongs_to(model_class, on_delete, references = nil)
-    {% optional = model_class.is_a?(Generic) %}
+  macro add_belongs_to(type_declaration, on_delete, references = nil)
+    {% unless type_declaration.is_a?(TypeDeclaration) %}
+      {% raise "add_belongs_to expected a type declaration like 'user : User', instead got: '#{type_declaration}'" %}
+    {% end %}
+    {% optional = type_declaration.type.is_a?(Union) %}
 
     {% if optional %}
-      {% underscored_class = model_class.type_vars.first.stringify.underscore %}
+      {% underscored_class = type_declaration.type.types.first.stringify.underscore %}
     {% else %}
-      {% underscored_class = model_class.names.first.stringify.underscore %}
+      {% underscored_class = type_declaration.type.stringify.underscore %}
     {% end %}
 
-    {% foreign_key_name = underscored_class + "_id" %}
+    {% foreign_key_name = type_declaration.var + "_id" %}
     %table_name = {{ references }} || LuckyInflector::Inflector.pluralize({{ underscored_class }})
 
     add_column :{{ foreign_key_name }}, Int32, {{ optional }}, reference: %table_name, on_delete: {{ on_delete }}
@@ -113,8 +116,8 @@ class LuckyMigrator::CreateTableStatement
   end
 
   macro add_belongs_to(_type_declaration, references = nil)
-    {% raise "Must use 'on_delete' when creating a add_belongs_to association.
-      Example: add_belongs_to User, on_delete: :cascade" %}
+    {% raise "Must use 'on_delete' when creating an add_belongs_to association.
+      Example: add_belongs_to user : User, on_delete: :cascade" %}
   end
 
   def null_fragment(optional)
