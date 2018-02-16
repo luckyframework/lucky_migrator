@@ -14,6 +14,7 @@ describe LuckyMigrator::AlterTableStatement do
       add updated_at : Time, fill_existing_with: :now
       add future_time : Time, default: Time.new
       remove :old_field
+      remove_belongs_to :employee
     end
 
     built.statements.size.should eq 7
@@ -29,7 +30,8 @@ describe LuckyMigrator::AlterTableStatement do
       ADD joined_at timestamptz NOT NULL DEFAULT NOW(),
       ADD updated_at timestamptz,
       ADD future_time timestamptz NOT NULL DEFAULT '#{Time.new.to_utc}',
-      DROP old_field
+      DROP old_field,
+      DROP employee_id
     SQL
 
     built.statements[1].should eq "CREATE UNIQUE INDEX users_age_index ON users USING btree (age);"

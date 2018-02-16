@@ -119,6 +119,13 @@ class LuckyMigrator::AlterTableStatement
     dropped_rows << "  DROP #{name.to_s}"
   end
 
+  macro remove_belongs_to(association_name)
+    {% unless association_name.is_a?(SymbolLiteral) %}
+      {% raise "remove_belongs_to expected a symbol like ':user', instead got: '#{association_name}'" %}
+    {% end %}
+    remove {{ association_name }}_id
+  end
+
   def null_fragment(optional)
     if optional
       ""
