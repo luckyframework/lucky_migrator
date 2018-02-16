@@ -18,7 +18,7 @@ class LuckyMigrator::CreateTableStatement
   #
   # ```
   # built = LuckyMigrator::CreateTableStatement.new(:users).build do
-  #   belongs_to Account, on_delete: :cascade
+  #   add_belongs_to Account, on_delete: :cascade
   #   add :email : String, unique: true
   # end
   #
@@ -96,7 +96,7 @@ class LuckyMigrator::CreateTableStatement
   end
 
   # Adds a references column and index given a model class and references option.
-  macro belongs_to(model_class, on_delete, references = nil)
+  macro add_belongs_to(model_class, on_delete, references = nil)
     {% optional = model_class.is_a?(Generic) %}
 
     {% if optional %}
@@ -112,9 +112,9 @@ class LuckyMigrator::CreateTableStatement
     add_index :{{ foreign_key_name }}
   end
 
-  macro belongs_to(_type_declaration, references = nil)
-    {% raise "Must use 'on_delete' when creating a belongs_to association.
-      Example: belongs_to User, on_delete: :cascade" %}
+  macro add_belongs_to(_type_declaration, references = nil)
+    {% raise "Must use 'on_delete' when creating a add_belongs_to association.
+      Example: add_belongs_to User, on_delete: :cascade" %}
   end
 
   def null_fragment(optional)

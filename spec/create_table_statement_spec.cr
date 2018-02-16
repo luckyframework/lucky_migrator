@@ -101,9 +101,9 @@ describe LuckyMigrator::CreateTableStatement do
   describe "associations" do
     it "can create associations" do
       built = LuckyMigrator::CreateTableStatement.new(:comments).build do
-        belongs_to User, on_delete: :cascade
-        belongs_to Post?, on_delete: :restrict
-        belongs_to CategoryLabel, on_delete: :nullify, references: :custom_table
+        add_belongs_to User, on_delete: :cascade
+        add_belongs_to Post?, on_delete: :restrict
+        add_belongs_to CategoryLabel, on_delete: :nullify, references: :custom_table
       end
 
       built.statements.first.should eq <<-SQL
@@ -124,7 +124,7 @@ describe LuckyMigrator::CreateTableStatement do
     it "raises error when on_delete strategy is invalid or nil" do
       expect_raises Exception, "on_delete: :cascad is not supported. Please use :do_nothing, :cascade, :restrict, or :nullify" do
         LuckyMigrator::CreateTableStatement.new(:users).build do
-          belongs_to User, on_delete: :cascad
+          add_belongs_to User, on_delete: :cascad
         end
       end
     end
