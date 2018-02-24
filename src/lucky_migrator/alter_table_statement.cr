@@ -1,11 +1,13 @@
 require "./column_default_helpers"
 require "./column_type_option_helpers"
-require "./index_statement_helpers.cr"
+require "./index_statement_helpers"
+require "./references_helper"
 
 class LuckyMigrator::AlterTableStatement
   include LuckyMigrator::IndexStatementHelpers
   include LuckyMigrator::ColumnTypeOptionHelpers
   include LuckyMigrator::ColumnDefaultHelpers
+  include LuckyMigrator::ReferencesHelper
 
   getter rows = [] of String
   getter dropped_rows = [] of String
@@ -51,6 +53,38 @@ class LuckyMigrator::AlterTableStatement
     end
   end
 
+  # Adds a references column and index given a model class and references option.
+  macro add_belongs_to(type_declaration, on_delete, references = nil)
+    {% unless type_declaration.is_a?(TypeDeclaration) %}
+      {% raise "add_belongs_to expected a type declaration like 'user : User', instead got: '#{type_declaration}'" %}
+    {% end %}
+    {% optional = type_declaration.type.is_a?(Union) %}
+
+    {% if optional %}
+      {% underscored_class = type_declaration.type.types.first.stringify.underscore %}
+    {% else %}
+      {% underscored_class = type_declaration.type.stringify.underscore %}
+    {% end %}
+
+    {% foreign_key_name = type_declaration.var + "_id" %}
+    %table_name = {{ references }} || LuckyInflector::Inflector.pluralize({{ underscored_class }})
+
+    add_index :{{ foreign_key_name }}
+    add_column :{{ foreign_key_name }},
+      type: Int32,
+      optional: {{ optional }},
+      default: nil,
+      fill_existing_with: nil,
+      reference: %table_name,
+      on_delete: {{ on_delete }},
+      options: nil
+  end
+
+  macro add_belongs_to(_type_declaration, references = nil)
+    {% raise "Must use 'on_delete' when creating an add_belongs_to association.
+      Example: add_belongs_to user : User, on_delete: :cascade" %}
+  end
+
   macro add(type_declaration, index = false, using = :btree, unique = false, default = nil, fill_existing_with = nil, **type_options)
     {% options = type_options.empty? ? nil : type_options %}
 
@@ -78,7 +112,12 @@ class LuckyMigrator::AlterTableStatement
         {% fill_existing_with = nil %}
       {% end %}
 
-      add_column :{{ type_declaration.var }}, {{ type_declaration.type }}, false, {{ default }}, {{ fill_existing_with }}, options: {{ options }}
+      add_column :{{ type_declaration.var }},
+        type: {{ type_declaration.type }},
+        optional: false,
+        default: {{ default }},
+        fill_existing_with: {{ fill_existing_with }},
+        options: {{ options }}
     {% end %}
 
     {% if index || unique %}
@@ -86,7 +125,7 @@ class LuckyMigrator::AlterTableStatement
     {% end %}
   end
 
-  def add_column(name : Symbol, type : ColumnType, optional = false, default : ColumnDefaultType? = nil, fill_existing_with : ColumnDefaultType? = nil, options : NamedTuple? = nil)
+  def add_column(name : Symbol, type : ColumnType, optional = false, reference = nil, on_delete = :do_nothing, default : ColumnDefaultType? = nil, fill_existing_with : ColumnDefaultType? = nil, options : NamedTuple? = nil)
     if options
       column_type_with_options = column_type(type, **options)
     else
@@ -105,6 +144,7 @@ class LuckyMigrator::AlterTableStatement
       row << column_type_with_options
       row << null_fragment(optional)
       row << default_value(type, default) unless default.nil?
+      row << references(reference, on_delete)
     end
   end
 
