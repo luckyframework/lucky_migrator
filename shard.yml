@@ -4,6 +4,10 @@ version: 0.4.1
 authors:
   - Paul Smith <paulcsmith0218@gmail.com>
 
+targets:
+  gen.migration:
+    main: src/precompiled_tasks/gen/migration.cr
+
 dependencies:
   db:
     github: crystal-lang/crystal-db
@@ -17,6 +21,12 @@ dependencies:
     github: luckyframework/habitat
   lucky_inflector:
     github: luckyframework/lucky_inflector
+
+scripts:
+  postinstall: |
+    shards build
+    mkdir -p ../../bin/lucky/gen
+    cp $(pwd)/bin/gen.migration $(pwd)/../../bin/lucky/gen/migration
 
 crystal: 0.24.1
 

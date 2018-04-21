@@ -36,3 +36,6 @@ jobs:
       - run:
           name: "Run specs"
           command: crystal spec
+      - run:
+          name: "Ensure precompiled tasks work"
+          command: shards build
