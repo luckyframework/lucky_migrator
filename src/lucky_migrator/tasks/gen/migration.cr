@@ -1,6 +1,7 @@
 require "colorize"
 require "ecr"
 require "file_utils"
+require "../../../lucky_migrator"
 
 class LuckyMigrator::MigrationGenerator
   include LuckyCli::TextHelpers
