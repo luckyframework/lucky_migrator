@@ -144,9 +144,9 @@ class LuckyMigrator::Runner
       yield
     end
   rescue e : DB::ConnectionRefused
-    puts "Unable to connect to the database. Please check your configuration.".colorize(:red)
+    raise "Unable to connect to the database. Please check your configuration.".colorize(:red).to_s
   rescue e : Exception
-    puts "Unexpected error while running migrations: #{e.message}".colorize(:red)
+    raise "Unexpected error while running migrations: #{e.message}".colorize(:red).to_s
   end
 
   private def create_table_for_tracking_migrations
