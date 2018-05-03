@@ -53,6 +53,7 @@ class LuckyMigrator::Runner
 
   def self.create_db
     run "createdb #{self.cmd_args}"
+    puts "Done creating #{LuckyMigrator::Runner.db_name.colorize(:green)}"
   rescue e : Exception
     if (message = e.message) && message.includes?(%("#{self.db_name}" already exists))
       puts "Already created #{self.db_name.colorize(:green)}"
