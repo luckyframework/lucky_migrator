@@ -10,10 +10,8 @@ module LuckyMigrator
   def self.run
     yield
   rescue e : PQ::PQError
-    puts e.message.colorize(:red)
-    exit(1)
+    raise e.message.colorize(:red).to_s
   rescue e : Exception
-    puts e.message
-    exit(1)
+    raise e.message.to_s
   end
 end

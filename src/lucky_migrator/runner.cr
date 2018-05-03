@@ -46,7 +46,6 @@ class LuckyMigrator::Runner
   rescue e : Exception
     if (message = e.message) && message.includes?(%("#{self.db_name}" does not exist))
       puts "Already dropped #{self.db_name.colorize(:green)}"
-      exit(0)
     else
       raise e
     end
@@ -57,7 +56,6 @@ class LuckyMigrator::Runner
   rescue e : Exception
     if (message = e.message) && message.includes?(%("#{self.db_name}" already exists))
       puts "Already created #{self.db_name.colorize(:green)}"
-      exit(0)
     elsif (message = e.message) && (message.includes?("createdb: not found") || message.includes?("No command 'createdb' found"))
       raise <<-ERROR
       #{message}
@@ -89,7 +87,6 @@ class LuckyMigrator::Runner
     ENV.delete("PGPASSWORD") if self.db_password
     unless result.success?
       raise error_messages.to_s
-      exit(1)
     end
   end
 
