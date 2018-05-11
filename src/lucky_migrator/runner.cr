@@ -3,6 +3,8 @@ require "pg"
 require "colorize"
 
 class LuckyMigrator::Runner
+  MIGRATIONS_TABLE_NAME = "migrations"
+
   extend LuckyCli::TextHelpers
 
   @@migrations = [] of LuckyMigrator::Migration::V1.class
@@ -152,7 +154,7 @@ class LuckyMigrator::Runner
 
   private def create_table_for_tracking_migrations
     <<-SQL
-    CREATE TABLE IF NOT EXISTS migrations (
+    CREATE TABLE IF NOT EXISTS #{MIGRATIONS_TABLE_NAME} (
       id serial PRIMARY KEY,
       version bigint NOT NULL
     )
