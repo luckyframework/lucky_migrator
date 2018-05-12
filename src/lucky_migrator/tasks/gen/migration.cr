@@ -61,7 +61,8 @@ class Gen::Migration < LuckyCli::Task
 
   def call(name : String? = nil)
     LuckyMigrator.run do
-      if ARGV.first? || name
+      name = ARGV.first? || name
+      if name
         LuckyMigrator::MigrationGenerator.new(name: name).generate
       else
         raise "Migration name is required. Example: lucky gen.migration CreateUsers".colorize(:red).to_s
