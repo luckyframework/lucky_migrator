@@ -61,7 +61,7 @@ class Gen::Migration < LuckyCli::Task
 
   def call(name : String? = nil)
     LuckyMigrator.run do
-      name = ARGV.first? || name
+      name = name || ARGV.first?
       if name
         LuckyMigrator::MigrationGenerator.new(name: name).generate
       else
