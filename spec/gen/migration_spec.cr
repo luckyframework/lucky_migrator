@@ -5,7 +5,10 @@ include CleanupHelper
 describe Gen::Migration do
   it "generates a migration with custom name" do
     with_cleanup do
+      ARGV.push("Should Ignore This Name")
+
       Gen::Migration.new.call("Custom")
+
       should_generate_migration named: "custom.cr"
     end
   end
