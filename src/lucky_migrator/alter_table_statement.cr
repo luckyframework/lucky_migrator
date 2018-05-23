@@ -101,7 +101,8 @@ class LuckyMigrator::AlterTableStatement
             ▸ add #{type_declaration.var} : #{type_declaration.type}, default: "Something"
             ▸ add #{type_declaration.var} : #{type_declaration.type}, fill_existing_with: "Something"
             ▸ add #{type_declaration.var} : #{type_declaration.type}, fill_existing_with: :nothing
-          ERROR %}
+          ERROR
+        %}
       {% end %}
 
       {% if default && fill_existing_with %}
