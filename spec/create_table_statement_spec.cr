@@ -27,7 +27,7 @@ describe LuckyMigrator::CreateTableStatement do
   end
 
   it "can create tables with uuid primary keys" do
-    built = LuckyMigrator::CreateTableStatement.new(:users, :uuid).build do
+    built = LuckyMigrator::CreateTableStatement.new(:users, LuckyMigrator::PrimaryKeyType::UUID).build do
       add name : String
     end
 
