@@ -9,7 +9,7 @@ class LuckyMigrator::CreateTableStatement
 
   private getter rows = [] of String
 
-  def initialize(@table_name : Symbol, @primary_key_type : PrimaryKeyType = PrimaryKeyType::BigSerial)
+  def initialize(@table_name : Symbol, @primary_key_type : PrimaryKeyType = PrimaryKeyType::Serial)
   end
 
   # Accepts a block to build a table and indices using `add` and `add_index` methods.
@@ -64,11 +64,11 @@ class LuckyMigrator::CreateTableStatement
   end
 
   private def initial_table_statement
-    if @primary_key_type == PrimaryKeyType::UUID
-      id_column_type = "uuid"
-    else
-      id_column_type = "serial"
-    end
+    id_column_type = if @primary_key_type == PrimaryKeyType::UUID
+                       "uuid"
+                     else
+                       "serial"
+                     end
     <<-SQL
     CREATE TABLE #{@table_name} (
       id #{id_column_type} PRIMARY KEY,

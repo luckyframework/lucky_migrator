@@ -1,6 +1,6 @@
 module LuckyMigrator
   enum PrimaryKeyType
-    BigSerial
+    Serial
     UUID
   end
 end

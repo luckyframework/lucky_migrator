@@ -1,5 +1,5 @@
 module LuckyMigrator::StatementHelpers
-  macro create(table_name, primary_key_type = LuckyMigrator::PrimaryKeyType::BigSerial)
+  macro create(table_name, primary_key_type = LuckyMigrator::PrimaryKeyType::Serial)
     statements = LuckyMigrator::CreateTableStatement.new({{ table_name }}, {{ primary_key_type }}).build do
       {{ yield }}
     end.statements
