@@ -26,6 +26,21 @@ describe LuckyMigrator::CreateTableStatement do
     SQL
   end
 
+  it "can create tables with uuid primary keys" do
+    built = LuckyMigrator::CreateTableStatement.new(:users, LuckyMigrator::PrimaryKeyType::UUID).build do
+      add name : String
+    end
+
+    built.statements.size.should eq 1
+    built.statements.first.should eq <<-SQL
+    CREATE TABLE users (
+      id uuid PRIMARY KEY,
+      created_at timestamptz NOT NULL,
+      updated_at timestamptz NOT NULL,
+      name text NOT NULL);
+    SQL
+  end
+
   it "sets default values" do
     built = LuckyMigrator::CreateTableStatement.new(:users).build do
       add name : String, default: "name"

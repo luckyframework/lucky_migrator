@@ -9,7 +9,7 @@ class LuckyMigrator::CreateTableStatement
 
   private getter rows = [] of String
 
-  def initialize(@table_name : Symbol)
+  def initialize(@table_name : Symbol, @primary_key_type : PrimaryKeyType = PrimaryKeyType::Serial)
   end
 
   # Accepts a block to build a table and indices using `add` and `add_index` methods.
@@ -35,6 +35,15 @@ class LuckyMigrator::CreateTableStatement
   #   "CREATE UNIQUE INDEX users_email_index ON users USING btree (email);"
   # ]
   # ```
+  #
+  # An optional second argument can toggle between the usage of a numeric or uuid
+  # based id column.
+  #
+  # ```
+  # built = LuckyMigrator::CreateTableStatement.new(:users, PrimaryKeyType::UUID).build do
+  #   add :email : String, unique: true
+  # end
+  # ```
   def build : CreateTableStatement
     with self yield
     self
@@ -55,9 +64,14 @@ class LuckyMigrator::CreateTableStatement
   end
 
   private def initial_table_statement
+    id_column_type = if @primary_key_type == PrimaryKeyType::UUID
+                       "uuid"
+                     else
+                       "serial"
+                     end
     <<-SQL
     CREATE TABLE #{@table_name} (
-      id serial PRIMARY KEY,
+      id #{id_column_type} PRIMARY KEY,
       created_at timestamptz NOT NULL,
       updated_at timestamptz NOT NULL,
     SQL
