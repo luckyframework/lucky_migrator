@@ -22,6 +22,7 @@ describe LuckyMigrator::CreateTableStatement do
       add joined_at : Time
       add amount_paid : Float, precision: 10, scale: 2
       add email : String?
+      add reference : UUID
     end
 
     built.statements.size.should eq 1
@@ -35,7 +36,8 @@ describe LuckyMigrator::CreateTableStatement do
       completed boolean NOT NULL,
       joined_at timestamptz NOT NULL,
       amount_paid decimal(10,2) NOT NULL,
-      email text);
+      email text,
+      reference uuid NOT NULL);
     SQL
   end
 

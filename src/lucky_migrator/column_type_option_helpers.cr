@@ -1,5 +1,5 @@
 module LuckyMigrator::ColumnTypeOptionHelpers
-  alias ColumnType = String.class | Time.class | Int32.class | Int64.class | Bool.class | Float.class
+  alias ColumnType = String.class | Time.class | Int32.class | Int64.class | Bool.class | Float.class | UUID.class
 
   def column_type(type : String.class)
     "text"
@@ -27,5 +27,9 @@ module LuckyMigrator::ColumnTypeOptionHelpers
 
   def column_type(type : Float.class, precision : Int32, scale : Int32)
     "decimal(#{precision},#{scale})"
+  end
+
+  def column_type(type : UUID.class)
+    "uuid"
   end
 end
