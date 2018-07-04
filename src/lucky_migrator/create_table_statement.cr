@@ -56,7 +56,7 @@ class LuckyMigrator::CreateTableStatement
   private def table_statement
     String.build do |statement|
       statement << initial_table_statement
-      statement << "\n"
+      statement << ",\n" unless rows.empty?
 
       statement << rows.join(",\n")
       statement << ");"
@@ -73,7 +73,7 @@ class LuckyMigrator::CreateTableStatement
     CREATE TABLE #{@table_name} (
       id #{id_column_type} PRIMARY KEY,
       created_at timestamptz NOT NULL,
-      updated_at timestamptz NOT NULL,
+      updated_at timestamptz NOT NULL
     SQL
   end
 

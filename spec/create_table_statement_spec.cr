@@ -1,6 +1,19 @@
 require "./spec_helper"
 
 describe LuckyMigrator::CreateTableStatement do
+  it "can create tables with no user defined columns" do
+    built = LuckyMigrator::CreateTableStatement.new(:users).build do
+    end
+
+    built.statements.size.should eq 1
+    built.statements.first.should eq <<-SQL
+    CREATE TABLE users (
+      id serial PRIMARY KEY,
+      created_at timestamptz NOT NULL,
+      updated_at timestamptz NOT NULL);
+    SQL
+  end
+
   it "can create tables" do
     built = LuckyMigrator::CreateTableStatement.new(:users).build do
       add name : String
