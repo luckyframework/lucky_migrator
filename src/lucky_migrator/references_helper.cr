@@ -5,7 +5,7 @@ module LuckyMigrator::ReferencesHelper
     elsif on_delete == :do_nothing
       " REFERENCES #{table_name}"
     else
-      " REFERENCES #{table_name}" + " ON DELETE " + on_delete_sql(on_delete) 
+      " REFERENCES #{table_name}" + " ON DELETE " + on_delete_sql(on_delete)
     end
   end
 
