@@ -142,7 +142,7 @@ describe LuckyMigrator::CreateTableStatement do
         updated_at timestamptz NOT NULL,
         user_id int NOT NULL REFERENCES users ON DELETE CASCADE,
         post_id int REFERENCES posts ON DELETE RESTRICT,
-        category_label_id int NOT NULL REFERENCES custom_table ON DELETE NULLIFY,
+        category_label_id int NOT NULL REFERENCES custom_table ON DELETE SET NULL,
         employee_id int NOT NULL REFERENCES users ON DELETE CASCADE);
       SQL
 

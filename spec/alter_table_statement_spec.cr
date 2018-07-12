@@ -55,7 +55,7 @@ describe LuckyMigrator::AlterTableStatement do
       ALTER TABLE comments
         ADD user_id int NOT NULL REFERENCES users ON DELETE CASCADE,
         ADD post_id int REFERENCES posts ON DELETE RESTRICT,
-        ADD category_label_id int NOT NULL REFERENCES custom_table ON DELETE NULLIFY,
+        ADD category_label_id int NOT NULL REFERENCES custom_table ON DELETE SET NULL,
         ADD employee_id int NOT NULL REFERENCES users ON DELETE CASCADE
       SQL
 

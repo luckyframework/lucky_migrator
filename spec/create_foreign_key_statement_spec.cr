@@ -1,9 +1,14 @@
 require "./spec_helper"
 
 describe LuckyMigrator::CreateForeignKeyStatement do
-  it "generates correct sql" do
+  it "generates correct sql with cascade strategy" do
     statement = LuckyMigrator::CreateForeignKeyStatement.new(:comments, :users, column: :author_id, on_delete: :cascade, primary_key: :uid).build
     statement.should eq "ALTER TABLE comments ADD CONSTRAINT comments_author_id_fk FOREIGN KEY (author_id) REFERENCES users (uid) ON DELETE CASCADE;"
+  end
+
+  it "generates correct sql with nullify strategy" do
+    statement = LuckyMigrator::CreateForeignKeyStatement.new(:comments, :users, column: :author_id, on_delete: :nullify, primary_key: :uid).build
+    statement.should eq "ALTER TABLE comments ADD CONSTRAINT comments_author_id_fk FOREIGN KEY (author_id) REFERENCES users (uid) ON DELETE SET NULL;"
   end
 
   it "raises error on invalid on_delete strategy" do
