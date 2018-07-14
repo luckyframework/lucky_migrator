@@ -1,5 +1,6 @@
 require "db"
 require "pg"
+require "uuid"
 require "lucky_cli"
 require "lucky_record"
 require "lucky_inflector"
