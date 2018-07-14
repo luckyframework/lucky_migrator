@@ -54,7 +54,7 @@ class LuckyMigrator::AlterTableStatement
   end
 
   # Adds a references column and index given a model class and references option.
-  macro add_belongs_to(type_declaration, on_delete, references = nil)
+  macro add_belongs_to(type_declaration, on_delete, references = nil, foreign_key_type = LuckyMigrator::PrimaryKeyType::Serial)
     {% unless type_declaration.is_a?(TypeDeclaration) %}
       {% raise "add_belongs_to expected a type declaration like 'user : User', instead got: '#{type_declaration}'" %}
     {% end %}
@@ -71,7 +71,7 @@ class LuckyMigrator::AlterTableStatement
 
     add_index :{{ foreign_key_name }}
     add_column :{{ foreign_key_name }},
-      type: Int32,
+      type: {{ foreign_key_type }}.db_type,
       optional: {{ optional }},
       default: nil,
       fill_existing_with: nil,

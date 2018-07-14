@@ -135,6 +135,7 @@ describe LuckyMigrator::CreateTableStatement do
         add_belongs_to post : Post?, on_delete: :restrict
         add_belongs_to category_label : CategoryLabel, on_delete: :nullify, references: :custom_table
         add_belongs_to employee : User, on_delete: :cascade
+        add_belongs_to line_item : LineItem, on_delete: :cascade, foreign_key_type: LuckyMigrator::PrimaryKeyType::UUID
       end
 
       built.statements.first.should eq <<-SQL
@@ -145,7 +146,8 @@ describe LuckyMigrator::CreateTableStatement do
         user_id int NOT NULL REFERENCES users ON DELETE CASCADE,
         post_id int REFERENCES posts ON DELETE RESTRICT,
         category_label_id int NOT NULL REFERENCES custom_table ON DELETE SET NULL,
-        employee_id int NOT NULL REFERENCES users ON DELETE CASCADE);
+        employee_id int NOT NULL REFERENCES users ON DELETE CASCADE,
+        line_item_id uuid NOT NULL REFERENCES line_items ON DELETE CASCADE);
       SQL
 
       built.statements[1].should eq "CREATE INDEX comments_user_id_index ON comments USING btree (user_id);"
