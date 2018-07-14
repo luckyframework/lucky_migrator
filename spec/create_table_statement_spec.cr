@@ -154,6 +154,7 @@ describe LuckyMigrator::CreateTableStatement do
       built.statements[2].should eq "CREATE INDEX comments_post_id_index ON comments USING btree (post_id);"
       built.statements[3].should eq "CREATE INDEX comments_category_label_id_index ON comments USING btree (category_label_id);"
       built.statements[4].should eq "CREATE INDEX comments_employee_id_index ON comments USING btree (employee_id);"
+      built.statements[5].should eq "CREATE INDEX comments_line_item_id_index ON comments USING btree (line_item_id);"
     end
 
     it "raises error when on_delete strategy is invalid or nil" do
