@@ -9,6 +9,9 @@ class LuckyMigrator::Runner
 
   @@migrations = [] of LuckyMigrator::Migration::V1.class
 
+  def initialize(@quiet : Bool = false)
+  end
+
   Habitat.create do
     setting database : String
   end
@@ -53,9 +56,11 @@ class LuckyMigrator::Runner
     end
   end
 
-  def self.create_db
+  def self.create_db(quiet? : Bool = false)
     run "createdb #{self.cmd_args}"
-    puts "Done creating #{LuckyMigrator::Runner.db_name.colorize(:green)}"
+    unless quiet?
+      puts "Done creating #{LuckyMigrator::Runner.db_name.colorize(:green)}"
+    end
   rescue e : Exception
     if (message = e.message) && message.includes?(%("#{self.db_name}" already exists))
       puts "Already created #{self.db_name.colorize(:green)}"
