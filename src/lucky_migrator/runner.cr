@@ -100,7 +100,7 @@ class LuckyMigrator::Runner
 
   def run_pending_migrations
     prepare_for_migration do
-      pending_migrations.each &.new.up
+      pending_migrations.each &.new.up(!@quiet)
     end
   end
 

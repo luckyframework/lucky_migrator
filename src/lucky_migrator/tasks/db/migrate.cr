@@ -3,9 +3,13 @@ require "colorize"
 class Db::Migrate < LuckyCli::Task
   banner "Migrate the database"
 
-  def call
+  def initialize(@quiet : Bool = false)
+    @quiet = ARGV.includes? "--quiet"
+  end
+
+  def call(args = ARGV)
     LuckyMigrator.run do
-      LuckyMigrator::Runner.new.run_pending_migrations
+      LuckyMigrator::Runner.new(@quiet).run_pending_migrations
     end
   end
 end
