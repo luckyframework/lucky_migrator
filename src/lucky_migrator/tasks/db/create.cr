@@ -13,7 +13,7 @@ class Db::Create < LuckyCli::Task
 
   private def parse_options
     OptionParser.parse! do |parser|
-      parser.banner = "Usage: lucky db.migrate [arguments]"
+      parser.banner = "Usage: lucky db.create [arguments]"
       parser.on("--quiet", "Doesn't print success output") { @quiet = true }
       parser.on("-h", "--help", "Help here") {
         puts parser
