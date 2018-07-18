@@ -63,7 +63,9 @@ class LuckyMigrator::Runner
     end
   rescue e : Exception
     if (message = e.message) && message.includes?(%("#{self.db_name}" already exists))
-      puts "Already created #{self.db_name.colorize(:green)}"
+      unless quiet?
+        puts "Already created #{self.db_name.colorize(:green)}"
+      end
     elsif (message = e.message) && (message.includes?("createdb: not found") || message.includes?("No command 'createdb' found"))
       raise <<-ERROR
       #{message}
@@ -100,7 +102,7 @@ class LuckyMigrator::Runner
 
   def run_pending_migrations
     prepare_for_migration do
-      pending_migrations.each &.new.up(!@quiet)
+      pending_migrations.each &.new.up(log: !@quiet)
     end
   end
 
@@ -147,7 +149,9 @@ class LuckyMigrator::Runner
   private def prepare_for_migration
     setup_migration_tracking_tables
     if pending_migrations.empty?
-      puts "Did nothing. No pending migrations.".colorize(:green)
+      unless @quiet
+        puts "Did nothing. No pending migrations.".colorize(:green)
+      end
     else
       yield
     end
