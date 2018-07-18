@@ -25,7 +25,7 @@ abstract class LuckyMigrator::Migration::V1
   # helpers to generate and collect SQL statements in the
   # @prepared_statements array. Each statement is then executed in  a
   # transaction and tracked upon completion.
-  def up(log = true)
+  def up(quiet = false)
     if migrated?
       puts "Already migrated #{self.class.name.colorize(:cyan)}"
     else
@@ -33,7 +33,7 @@ abstract class LuckyMigrator::Migration::V1
       migrate
       execute_in_transaction @prepared_statements do |tx|
         track_migration(tx)
-        if log
+        unless quiet
           puts "Migrated #{self.class.name.colorize(:green)}"
         end
       end
@@ -41,7 +41,7 @@ abstract class LuckyMigrator::Migration::V1
   end
 
   # Same as #up except calls rollback method in migration.
-  def down(log = true)
+  def down(quiet = false)
     if pending?
       puts "Already rolled back #{self.class.name.colorize(:cyan)}"
     else
@@ -49,7 +49,7 @@ abstract class LuckyMigrator::Migration::V1
       rollback
       execute_in_transaction @prepared_statements do |tx|
         untrack_migration(tx)
-        if log
+        unless quiet
           puts "Rolled back #{self.class.name.colorize(:green)}"
         end
       end

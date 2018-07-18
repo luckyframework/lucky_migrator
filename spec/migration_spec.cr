@@ -45,11 +45,11 @@ describe LuckyMigrator::Migration::V1 do
 
   describe "statement execution order" do
     Spec.after_each do
-      MigrationWithOrderDependentExecute::V998.new.down(log: false)
+      MigrationWithOrderDependentExecute::V998.new.down(quiet: true)
     end
 
     it "runs execute statements in the order they were called" do
-      MigrationWithOrderDependentExecute::V998.new.up(log: false)
+      MigrationWithOrderDependentExecute::V998.new.up(quiet: true)
       columns = get_column_names("execution_order")
       columns.includes?("new_col").should be_true
       columns.includes?("bar").should be_true
