@@ -4,7 +4,6 @@ class Db::Migrate < LuckyCli::Task
   banner "Migrate the database"
 
   def initialize(@quiet : Bool = false)
-    @quiet = ARGV.includes? "--quiet"
   end
 
   def call(args = ARGV)
