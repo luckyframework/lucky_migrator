@@ -6,7 +6,7 @@ class Db::Migrate < LuckyCli::Task
   def initialize(@quiet : Bool = false)
   end
 
-  def call(args = ARGV)
+  def call
     LuckyMigrator.run do
       LuckyMigrator::Runner.new(@quiet).run_pending_migrations
     end
