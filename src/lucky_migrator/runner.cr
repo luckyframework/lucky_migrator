@@ -9,6 +9,9 @@ class LuckyMigrator::Runner
 
   @@migrations = [] of LuckyMigrator::Migration::V1.class
 
+  def initialize(@quiet : Bool = false)
+  end
+
   Habitat.create do
     setting database : String
   end
@@ -53,12 +56,16 @@ class LuckyMigrator::Runner
     end
   end
 
-  def self.create_db
+  def self.create_db(quiet? : Bool = false)
     run "createdb #{self.cmd_args}"
-    puts "Done creating #{LuckyMigrator::Runner.db_name.colorize(:green)}"
+    unless quiet?
+      puts "Done creating #{LuckyMigrator::Runner.db_name.colorize(:green)}"
+    end
   rescue e : Exception
     if (message = e.message) && message.includes?(%("#{self.db_name}" already exists))
-      puts "Already created #{self.db_name.colorize(:green)}"
+      unless quiet?
+        puts "Already created #{self.db_name.colorize(:green)}"
+      end
     elsif (message = e.message) && (message.includes?("createdb: not found") || message.includes?("No command 'createdb' found"))
       raise <<-ERROR
       #{message}
@@ -95,7 +102,7 @@ class LuckyMigrator::Runner
 
   def run_pending_migrations
     prepare_for_migration do
-      pending_migrations.each &.new.up
+      pending_migrations.each &.new.up(@quiet)
     end
   end
 
@@ -142,7 +149,9 @@ class LuckyMigrator::Runner
   private def prepare_for_migration
     setup_migration_tracking_tables
     if pending_migrations.empty?
-      puts "Did nothing. No pending migrations.".colorize(:green)
+      unless @quiet
+        puts "Did nothing. No pending migrations.".colorize(:green)
+      end
     else
       yield
     end
