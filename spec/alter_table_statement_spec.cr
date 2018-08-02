@@ -49,6 +49,7 @@ describe LuckyMigrator::AlterTableStatement do
         add_belongs_to post : Post?, on_delete: :restrict
         add_belongs_to category_label : CategoryLabel, on_delete: :nullify, references: :custom_table
         add_belongs_to employee : User, on_delete: :cascade
+        add_belongs_to line_item : LineItem, on_delete: :cascade, foreign_key_type: LuckyMigrator::PrimaryKeyType::UUID
       end
 
       built.statements.first.should eq <<-SQL
@@ -56,13 +57,15 @@ describe LuckyMigrator::AlterTableStatement do
         ADD user_id int NOT NULL REFERENCES users ON DELETE CASCADE,
         ADD post_id int REFERENCES posts ON DELETE RESTRICT,
         ADD category_label_id int NOT NULL REFERENCES custom_table ON DELETE SET NULL,
-        ADD employee_id int NOT NULL REFERENCES users ON DELETE CASCADE
+        ADD employee_id int NOT NULL REFERENCES users ON DELETE CASCADE,
+        ADD line_item_id uuid NOT NULL REFERENCES line_items ON DELETE CASCADE
       SQL
 
       built.statements[1].should eq "CREATE INDEX comments_user_id_index ON comments USING btree (user_id);"
       built.statements[2].should eq "CREATE INDEX comments_post_id_index ON comments USING btree (post_id);"
       built.statements[3].should eq "CREATE INDEX comments_category_label_id_index ON comments USING btree (category_label_id);"
       built.statements[4].should eq "CREATE INDEX comments_employee_id_index ON comments USING btree (employee_id);"
+      built.statements[5].should eq "CREATE INDEX comments_line_item_id_index ON comments USING btree (line_item_id);"
     end
 
     it "raises error when on_delete strategy is invalid or nil" do
