@@ -1,5 +1,6 @@
 module LuckyMigrator::ColumnDefaultHelpers
-  alias ColumnDefaultType = String | Time | Int32 | Int64 | Float32 | Float64 | Bool | Symbol
+  alias JSONDefaultType = Array(JSONDefaultType) | Bool | Float64 | Hash(String, JSONDefaultType) | Int64 | String | Nil
+  alias ColumnDefaultType = String | Time | Int32 | Int64 | Float32 | Float64 | Bool | Symbol | JSONDefaultType
 
   def value_to_string(type : String.class | Time.class, value : String | Time)
     "'#{value}'"
@@ -43,5 +44,9 @@ module LuckyMigrator::ColumnDefaultHelpers
 
   def default_value(type : Time.class, default : Symbol)
     " DEFAULT #{value_to_string(type, default)}"
+  end
+
+  def default_value(type : JSON::Any.class, default : JSONDefaultType)
+    " DEFAULT '#{default.to_json.gsub(/'/,"''")}'"
   end
 end
