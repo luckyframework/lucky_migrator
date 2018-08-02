@@ -47,6 +47,6 @@ module LuckyMigrator::ColumnDefaultHelpers
   end
 
   def default_value(type : JSON::Any.class, default : JSONDefaultType)
-    " DEFAULT '#{default.to_json.gsub(/'/,"''")}'"
+    " DEFAULT '#{default.to_json.gsub(/'/, "''")}'"
   end
 end
