@@ -2,14 +2,47 @@ require "../spec_helper"
 
 include CleanupHelper
 
-describe Gen::Migration do
-  it "generates a migration with custom name" do
+describe "Generating migrations" do
+  it "can generate a migration with custom name" do
     with_cleanup do
       ARGV.push("Should Ignore This Name")
 
       Gen::Migration.new.call("Custom")
 
       should_generate_migration named: "custom.cr"
+    end
+  end
+
+  it "can generate a migration with custom name and contents" do
+    with_cleanup do
+      migrate_contents = <<-CONTENTS
+      create :users do
+        add name : String
+      end
+      CONTENTS
+      rollback_contents = <<-CONTENTS
+      drop :users
+      CONTENTS
+
+      LuckyMigrator::MigrationGenerator.new(
+        "CreateUsers",
+        migrate_contents: migrate_contents,
+        rollback_contents: rollback_contents
+      ).generate(_version: "123")
+
+      File.read("./db/migrations/123_create_users.cr").should contain <<-MIGRATION
+      class CreateUsers::V123 < LuckyMigrator::Migration::V1
+        def migrate
+          create :users do
+            add name : String
+          end
+        end
+
+        def rollback
+          drop :users
+        end
+      end
+      MIGRATION
     end
   end
 end
