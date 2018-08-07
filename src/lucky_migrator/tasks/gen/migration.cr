@@ -8,17 +8,49 @@ class LuckyMigrator::MigrationGenerator
 
   getter :name
   @_version : String?
+  @name : String
+  @migrate_contents : String?
+  @rollback_contents : String?
 
   ECR.def_to_s "#{__DIR__}/migration.ecr"
 
-  def initialize(@name : String)
+  def initialize(@name)
   end
 
-  def generate
+  def initialize(@name, @migrate_contents : String, @rollback_contents : String)
+  end
+
+  def generate(@_version = @_version)
     ensure_camelcase_name
     make_migrations_folder_if_missing
     File.write(file_path, contents)
     puts "Created #{migration_class_name.colorize(:green)} in .#{relative_file_path.colorize(:green)}"
+  end
+
+  def formatted_migrate_contents : String?
+    @migrate_contents.try do |contents|
+      pad_contents(contents)
+    end
+  end
+
+  def formatted_rollback_contents : String?
+    @rollback_contents.try do |contents|
+      pad_contents(contents)
+    end
+  end
+
+  private def pad_contents(contents : String) : String
+    String.build do |string|
+      contents.split("\n").each_with_index do |line, index|
+        if index.zero?
+          string << line
+        else
+          string << "    "
+          string << line
+        end
+        string << "\n"
+      end
+    end.chomp
   end
 
   private def ensure_camelcase_name
