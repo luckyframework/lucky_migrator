@@ -8,8 +8,18 @@ class LuckyMigrator::Runner
   extend LuckyCli::TextHelpers
 
   @@migrations = [] of LuckyMigrator::Migration::V1.class
+  @@schema = "public"
+
+  def self.schema
+    @@schema
+  end
+
+  def self.schema=(schema)
+    @@schema = schema
+  end
 
   def initialize(@quiet : Bool = false)
+    @@migrations.each &.schema = @@schema
   end
 
   Habitat.create do
@@ -142,6 +152,8 @@ class LuckyMigrator::Runner
 
   private def setup_migration_tracking_tables
     DB.open(LuckyRecord::Repo.settings.url) do |db|
+      db.exec create_schema unless @@schema == "public"
+      db.exec set_schema unless @@schema == "public"
       db.exec create_table_for_tracking_migrations
     end
   end
@@ -159,6 +171,18 @@ class LuckyMigrator::Runner
     raise "Unable to connect to the database. Please check your configuration.".colorize(:red).to_s
   rescue e : Exception
     raise "Unexpected error while running migrations: #{e.message}".colorize(:red).to_s
+  end
+
+  def create_schema
+    <<-SQL
+    CREATE SCHEMA IF NOT EXISTS #{@@schema}
+    SQL
+  end
+
+  def set_schema
+    <<-SQL
+    SET search_path TO #{@@schema};
+    SQL
   end
 
   private def create_table_for_tracking_migrations

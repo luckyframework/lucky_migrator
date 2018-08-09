@@ -20,6 +20,15 @@ abstract class LuckyMigrator::Migration::V1
   abstract def version
 
   getter prepared_statements = [] of String
+  @@schema = "public"
+
+  def self.schema
+    @@schema
+  end
+
+  def self.schema=(schema)
+    @@schema = schema
+  end
 
   # Unless already migrated, calls migrate which in turn calls statement
   # helpers to generate and collect SQL statements in the
@@ -62,15 +71,18 @@ abstract class LuckyMigrator::Migration::V1
 
   def migrated?
     DB.open(LuckyRecord::Repo.settings.url) do |db|
+      db.exec set_schema unless @@schema == "public"
       db.query_one? "SELECT id FROM migrations WHERE version = $1", version, as: Int32
     end
   end
 
   private def track_migration(tx : DB::Transaction)
+    tx.connection.exec set_schema unless @@schema == "public"
     tx.connection.exec "INSERT INTO migrations(version) VALUES ($1)", version
   end
 
   private def untrack_migration(tx : DB::Transaction)
+    tx.connection.exec set_schema unless @@schema == "public"
     tx.connection.exec "DELETE FROM migrations WHERE version = $1", version
   end
 
@@ -92,7 +104,10 @@ abstract class LuckyMigrator::Migration::V1
   private def execute_in_transaction(statements : Array(String))
     DB.open(LuckyRecord::Repo.settings.url) do |db|
       db.transaction do |tx|
-        statements.each { |s| tx.connection.exec s }
+        statements.each do |s|
+          tx.connection.exec set_schema unless @@schema == "public"
+          tx.connection.exec s
+        end
         yield tx
       end
     end
@@ -100,5 +115,11 @@ abstract class LuckyMigrator::Migration::V1
 
   def reset_prepared_statements
     @prepared_statements = [] of String
+  end
+
+  def set_schema
+    <<-SQL
+    SET search_path TO #{@@schema};
+    SQL
   end
 end
