@@ -1,8 +1,8 @@
 require "./spec_helper"
-LuckyMigrator::Runner.schema = "public"
+LuckyMigrator::Runner.schema = "custom"
 LuckyMigrator::Runner.new.setup_migration_tracking_tables
 
-class MigrationThatPartiallyWorks::V999 < LuckyMigrator::Migration::V1
+class CustomMigrationThatPartiallyWorks::V999 < LuckyMigrator::Migration::V1
   def migrate
     create :fake_things do
       add foo : String
@@ -17,7 +17,7 @@ class MigrationThatPartiallyWorks::V999 < LuckyMigrator::Migration::V1
   end
 end
 
-class MigrationWithOrderDependentExecute::V998 < LuckyMigrator::Migration::V1
+class CustomMigrationWithOrderDependentExecute::V998 < LuckyMigrator::Migration::V1
   def migrate
     execute "CREATE TABLE execution_order ();"
 
@@ -33,39 +33,52 @@ class MigrationWithOrderDependentExecute::V998 < LuckyMigrator::Migration::V1
   end
 end
 
+LuckyMigrator::Runner.migrations.each do |migration|
+  migration.schema = "custom"
+end
+
 describe LuckyMigrator::Migration::V1 do
   it "executes statements in a transaction" do
     expect_raises Exception, %(relation "table_does_not_exist" does not exist) do
-      MigrationThatPartiallyWorks::V999.new.up
+      CustomMigrationThatPartiallyWorks::V999.new.up
     end
 
     exists = LuckyRecord::Repo.run do |db|
-      db.query_one? "SELECT EXISTS (SELECT 1 FROM pg_tables WHERE tablename = 'fake_things');", as: Bool
+      db.query_one? "SELECT EXISTS (SELECT 1 FROM pg_tables WHERE tablename='fake_things' AND schemaname='custom');", as: Bool
     end
     exists.should be_false
   end
 
   describe "statement execution order" do
     Spec.after_each do
-      MigrationWithOrderDependentExecute::V998.new.down(quiet: true)
+      CustomMigrationWithOrderDependentExecute::V998.new.down(quiet: true)
     end
 
     it "runs execute statements in the order they were called" do
-      MigrationWithOrderDependentExecute::V998.new.up(quiet: true)
-      columns = get_column_names("execution_order")
+      CustomMigrationWithOrderDependentExecute::V998.new.up(quiet: true)
+      columns = get_column_names("custom", "execution_order")
       columns.includes?("new_col").should be_true
       columns.includes?("bar").should be_true
     end
   end
 end
 
-private def get_column_names(table_name)
+private def get_column_names(schema, table_name)
   statement = <<-SQL
   SELECT column_name as name, is_nullable::boolean as nilable
   FROM information_schema.columns
-  WHERE table_schema = 'public'
+  WHERE table_schema = '#{schema}'
     AND table_name = '#{table_name}'
   SQL
 
-  LuckyRecord::Repo.run { |db| db.query_all statement, as: String }
+  LuckyRecord::Repo.run do |db|
+    db.exec set_schema(schema)
+    db.query_all statement, as: String
+  end
+end
+
+def set_schema(schema)
+  <<-SQL
+  SET search_path TO #{schema};
+  SQL
 end
