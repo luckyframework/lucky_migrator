@@ -150,7 +150,7 @@ class LuckyMigrator::Runner
     @@migrations.select &.new.pending?
   end
 
-  private def setup_migration_tracking_tables
+  def setup_migration_tracking_tables
     DB.open(LuckyRecord::Repo.settings.url) do |db|
       db.exec create_schema unless @@schema == "public"
       db.exec set_schema unless @@schema == "public"
