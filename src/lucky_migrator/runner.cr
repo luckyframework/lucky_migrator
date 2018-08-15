@@ -132,21 +132,21 @@ class LuckyMigrator::Runner
     end
   end
 
-  private def migrated_migrations
+  def migrated_migrations
     @@migrations.select &.new.migrated?
   end
 
-  private def pending_migrations
+  def pending_migrations
     @@migrations.select &.new.pending?
   end
 
-  private def setup_migration_tracking_tables
+  def setup_migration_tracking_tables
     DB.open(LuckyRecord::Repo.settings.url) do |db|
       db.exec create_table_for_tracking_migrations
     end
   end
 
-  private def prepare_for_migration
+  def prepare_for_migration
     setup_migration_tracking_tables
     if pending_migrations.empty?
       unless @quiet
@@ -165,6 +165,7 @@ class LuckyMigrator::Runner
     <<-SQL
     CREATE TABLE IF NOT EXISTS #{MIGRATIONS_TABLE_NAME} (
       id serial PRIMARY KEY,
+      schema text NOT NULL,
       version bigint NOT NULL
     )
     SQL
