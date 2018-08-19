@@ -66,7 +66,7 @@ This will create a timestamped migration in `db/migrations`
 To run the tests:
 
 * Install Postgres: ([macOS](https://postgresapp.com)/[Others](https://wiki.postgresql.org/wiki/Detailed_installation_guides))
-* Migrate the database using `lucky db.create && lucky db.migrate`
+* Install shards and set up the databases with `./bin/setup`
 * Run the tests with `crystal spec`
 
 ## Contributors
