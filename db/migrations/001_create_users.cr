@@ -12,7 +12,7 @@ class CreateUsers::V001 < LuckyMigrator::Migration::V1
 
     execute "CREATE INDEX users_num_index ON users USING btree (num);"
 
-    create_index :users, :last_name, unique: true
+    create_index :users, [:first_name, :last_name], unique: true
   end
 
   def rollback

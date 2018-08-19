@@ -1,4 +1,8 @@
+require "./index_statement_helpers"
+
 module LuckyMigrator::StatementHelpers
+  include LuckyMigrator::IndexStatementHelpers
+
   macro create(table_name, primary_key_type = LuckyMigrator::PrimaryKeyType::Serial)
     statements = LuckyMigrator::CreateTableStatement.new({{ table_name }}, {{ primary_key_type }}).build do
       {{ yield }}
@@ -27,12 +31,12 @@ module LuckyMigrator::StatementHelpers
     prepared_statements << CreateForeignKeyStatement.new(from, to, on_delete, column, primary_key).build
   end
 
-  def create_index(table_name : Symbol, column : Symbol, unique = false, using = :btree)
-    prepared_statements << CreateIndexStatement.new(table_name, column, using, unique).build
+  def create_index(table_name : Symbol, columns : Columns, unique = false, using = :btree)
+    prepared_statements << CreateIndexStatement.new(table_name, columns, using, unique).build
   end
 
-  def drop_index(table_name : Symbol, column : Symbol, if_exists = false, on_delete = :do_nothing)
-    prepared_statements << LuckyMigrator::DropIndexStatement.new(table_name, column, if_exists, on_delete).build
+  def drop_index(table_name : Symbol, columns : Columns, if_exists = false, on_delete = :do_nothing)
+    prepared_statements << LuckyMigrator::DropIndexStatement.new(table_name, columns, if_exists, on_delete).build
   end
 
   def make_required(table : Symbol, column : Symbol)
