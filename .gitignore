@@ -4,6 +4,10 @@
 /.crystal/
 /.shards/
 
+/bin/*
+!/bin/setup
+!/bin/test_tasks
+
 *.dwarf
 
 
