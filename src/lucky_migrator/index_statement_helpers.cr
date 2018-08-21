@@ -1,4 +1,6 @@
 module LuckyMigrator::IndexStatementHelpers
+  alias Columns = Symbol | Array(Symbol)
+
   private getter index_statements = [] of String
 
   # Generates raw sql for adding an index to a table column. Accepts 'unique' and 'using' options.
