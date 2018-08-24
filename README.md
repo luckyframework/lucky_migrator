@@ -1,6 +1,6 @@
-# LuckyMigrator
 
-A crystal library that can be used to create/drop/migrate/rollback your database
+
+# NOTE! LuckyMigrator has been merged with [LuckyRecord](https://github.com/luckyframework/lucky_record)
 
 ## Installation
 
